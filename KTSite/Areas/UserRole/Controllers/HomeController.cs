@@ -26,6 +26,7 @@ namespace KTSite.Areas.UserRole.Controllers
         {
             int PendingCount = 0;
             double PendingAmount = 0;
+            ViewBag.NotificationList = _unitOfWork.Notification.GetAll().Where(a => a.Visible);
             ViewBag.Name = _unitOfWork.ApplicationUser.GetAll().Where(q => q.UserName == User.Identity.Name).Select(q => q.Name).FirstOrDefault();
             ViewBag.Balance = _unitOfWork.PaymentBalance.GetAll().Where(a => a.UserNameId == returnUserNameId()).Select(a=>a.Balance).FirstOrDefault();
             var paymentHistory = _unitOfWork.PaymentHistory.GetAll().Where(a => a.UserNameId == returnUserNameId() && a.Status == SD.PaymentStatusPending);

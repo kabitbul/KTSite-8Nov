@@ -33,6 +33,8 @@ namespace KTSite.DataAccess.Data
         public DbSet<ChinaOrder> ChinaOrders { get; set; }
         public DbSet<ReturningItem> ReturningItems { get; set; }
         public DbSet<ReturnLabel> returnLabels { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
+        public DbSet<UserGuideline> UserGuidelines { get; set; }
 
     }
 }

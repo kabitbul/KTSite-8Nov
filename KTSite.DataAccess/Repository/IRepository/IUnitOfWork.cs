@@ -21,6 +21,8 @@ namespace KTSite.DataAccess.Repository.IRepository
         IChinaOrderRepository ChinaOrder { get; }
         IReturningItemRepository ReturningItem { get; }
         IReturnLabelRepository ReturnLabel { get; }
+        INotificationRepository Notification { get; }
+        IUserGuidelineRepository UserGuideline { get; }
         ISP_Call SP_Call { get; }
 
         void Save();
