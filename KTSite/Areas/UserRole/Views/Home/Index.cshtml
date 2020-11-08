@@ -1,0 +1,47 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4" style="color:darkgoldenrod">Welcome Back, @ViewBag.Name!</h1>
+</div>
+<div class="text-left display-3 p-4 border rounded col-5">
+    <h1>@ViewBag.Name, Your Current Balance is : @ViewBag.Balance.ToString("0.00")$</h1>
+	@if(ViewBag.PendingCount == 0)
+    {
+		<h1>No Pending Payments</h1>
+    }
+    else
+    {
+    <h1> You Have @ViewBag.PendingAmount$ waiting for Admin Approval</h1>
+    }
+
+</div>
+&nbsp;
+<div>
+	<div id="chartContainer" style="height: 370px; width: 70%;"></div>
+    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+</div>
+@section Scripts{
+    <script>
+window.onload = function () {
+
+var chart = new CanvasJS.Chart("chartContainer", {
+	animationEnabled: true,
+	theme: "light2", // "light1", "light2", "dark1", "dark2"
+	title: {
+		text: "Number Of Sold Items Per Day In The Last Month"
+	},
+	axisY: {
+		title: "No. of Items"
+	},
+	data: [{
+		type: "column",
+		dataPoints: @Html.Raw(ViewBag.DataPoints)
+	}]
+});
+chart.render();
+
+}
+    </script>
+}
