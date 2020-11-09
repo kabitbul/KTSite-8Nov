@@ -19,10 +19,10 @@ namespace KTSite.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Authorize(Roles = SD.Role_Admin)]
-    public class OrderVAController : Controller
+    public class OrderAdminController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
-        public OrderVAController(IUnitOfWork unitOfWork , IWebHostEnvironment hostEnvironment)
+        public OrderAdminController(IUnitOfWork unitOfWork , IWebHostEnvironment hostEnvironment)
         {
             _unitOfWork = unitOfWork;
         }
