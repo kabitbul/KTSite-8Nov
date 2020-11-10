@@ -28,11 +28,19 @@
     </div>
     <div class="row">
         <div class="col-4 offset-4">
-            <button type="submit" class="btn btn-primary form-control">Calculate</button>
+            @*<button type="submit" class="btn btn-primary form-control">Calculate</button>*@
+            <button type="button" class="btn btn-primary form-control" onclick="callIndex()">Calculate</button>
         </div>
     </div>
 </div>
 @section Scripts{
+    <script>
+   function callIndex() {
+       var avgDays = document.getElementById('AvgDays').value;
+       var TimeToArrive = document.getElementById('TimeToArrive').value;
+       window.location.href = '/Admin/InventoryAnalysis/Index/' + avgDays + '_' + TimeToArrive;
+}
+    </script>
 }
 
 

@@ -24,6 +24,8 @@ namespace KTSite.Models
         public int OnTheWay { get; set; }
         [NotMapped]
         public bool OwnByWarehouse { get; set; }
-        
+        [NotMapped]
+        public double AvgSales { get; set; }
+
     }
 }

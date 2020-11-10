@@ -6,10 +6,10 @@
 <br />
 <div class="row">
     <div class="col-6">
-        <h2 class="text-primary">Product Needs Restock </h2>
+        <h2 class="text-primary">Product Needs Restock(Defaukt Values are average of 3 days and shipping time from chine 100 days) </h2>
     </div>
     <div class="col-6 text-right">
-        <a class="btn btn-primary" asp-action="upsert" style="background-color:forestgreen"><i class="fas fa-plus"></i> &nbsp; Create New Product</a>
+        <a class="btn btn-primary" asp-action="CheckInventory" style="background-color:forestgreen"><i class="fas fa-plus"></i> &nbsp; Search with New Parameters</a>
     </div>
 </div>
 
@@ -20,9 +20,11 @@
             <tr class="table-info">
                 <th>Product</th>
                 <th>Cost</th>
+                <th>Average Daily sales</th>
                 <th>Current Inventory Count</th>
                 <th>On The Way</th>
                 <th>Own By Warehouse</th>
+                <th>Missing Quantity</th>
             </tr>
         </thead>
         @foreach (InventoryAnalysis inventoryAnalysis in Model)
@@ -30,6 +32,7 @@
     <tr>
         <td>@ViewBag.getProductName(inventoryAnalysis.ProductId)</td>
         <td>@inventoryAnalysis.Cost$</td>
+        <td>@inventoryAnalysis.AvgSales.ToString("0.00")</td>
         <td>@inventoryAnalysis.InventoryCount</td>
         <td>@inventoryAnalysis.OnTheWay</td>
         @if (@inventoryAnalysis.OwnByWarehouse)
@@ -38,7 +41,7 @@
                     else
                     {
     <td>No</td>                }
-        <td>@inventoryAnalysis.MissingQuantity</td>
+        <td>@inventoryAnalysis.MissingQuantity.ToString("0.00")</td>
     </tr>
         }
     </table>
