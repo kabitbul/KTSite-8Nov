@@ -32,6 +32,7 @@ namespace KTSite.Areas.Admin.Controllers
               new Func<string, string>(getUserName);
             ViewBag.getName =
             new Func<string, string>(getName);
+            ViewBag.IsUserRole =  new Func<int, bool>(IsUserRole); 
             return View(userNameIdList);
 
         }
@@ -82,6 +83,30 @@ namespace KTSite.Areas.Admin.Controllers
         public string getName(string userNameId)
         {
             return (_unitOfWork.ApplicationUser.GetAll().Where(q => q.Id == userNameId).Select(q => q.Name)).FirstOrDefault();
+        }
+        public bool IsUserRole(int Id)
+        {
+            string userName = (_unitOfWork.PaymentBalance.GetAll().Where(q => q.Id == Id).Select(q => q.UserNameId)).FirstOrDefault();
+            return
+                _unitOfWork.ApplicationUser.GetAll().Where(a => a.Id == userName).Any(a => a.Role == SD.Role_Users);
+        }
+        [HttpPost]
+        public IActionResult EditAllow(int[] Ids)
+        {
+            foreach (int Id in Ids)
+            {
+                PaymentBalance paymentBalance = _unitOfWork.PaymentBalance.GetAll().Where(a => a.Id == Id).FirstOrDefault();
+                if (paymentBalance.AllowNegativeBalance)
+                {
+                    paymentBalance.AllowNegativeBalance = false;
+                }
+                else
+                {
+                    paymentBalance.AllowNegativeBalance = true;
+                }
+                _unitOfWork.Save();
+            }
+            return View();
         }
         #region API CALLS
         [HttpGet]

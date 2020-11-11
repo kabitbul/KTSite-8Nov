@@ -49,7 +49,7 @@ using Newtonsoft.Json.Converters;
             OrderVM orderVM = new OrderVM()
             {
                 Orders = new Order(),
-                ProductList = _unitOfWork.Product.GetAll().Where(a=>a.AvailableForSellers).Select(i => new SelectListItem
+                ProductList = _unitOfWork.Product.GetAll().Where(a=>a.AvailableForSellers).OrderBy(a=>a.ProductName).Select(i => new SelectListItem
                 {
                     Text = i.ProductName,
                     Value = i.Id.ToString()
@@ -65,7 +65,9 @@ using Newtonsoft.Json.Converters;
             ViewBag.UNameId = uNameId;
             ViewBag.sysDate = DateTime.Now;
             ViewBag.ShowMsg = 0;
+            ViewBag.InsufficientFunds = false;
             ViewBag.failed = false;
+            orderVM.Orders.UsDate = DateTime.Now;
             return View(orderVM);
         }
         public IActionResult UpdateOrder(int id)
@@ -94,6 +96,7 @@ using Newtonsoft.Json.Converters;
             ViewBag.sysDate = DateTime.Now;
             ViewBag.ShowMsg = 0;
             ViewBag.failed = false;
+            ViewBag.InsufficientFunds = false;
             return View(orderVM);
         }
         public IActionResult AddOrdersExtension()
@@ -120,6 +123,7 @@ using Newtonsoft.Json.Converters;
             ViewBag.UNameId = uNameId;
             ViewBag.failed = "";
             ViewBag.ShowMsg = 0;
+            ViewBag.InsufficientFunds = false;
             return View(orderVM);
         }
         //allow return if not returned yet or returned part of total quantity
@@ -154,30 +158,18 @@ using Newtonsoft.Json.Converters;
             double productCost = (_unitOfWork.Product.GetAll().Where(q => q.Id == productId).Select(q => q.SellersCost)).FirstOrDefault();
             return Convert.ToDouble(String.Format("{0:0.00}", (productCost * quantity))); 
         }
-
+        public PaymentBalance userBalance(string userNameId)
+        {
+            return
+            _unitOfWork.PaymentBalance.GetAll().Where(a => a.UserNameId == userNameId).FirstOrDefault();
+        }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult AddOrdersManually(OrderVM orderVM)
         {
             string uNameId = (_unitOfWork.ApplicationUser.GetAll().Where(q => q.UserName == User.Identity.Name).Select(q => q.Id)).FirstOrDefault();
-            if (ModelState.IsValid)
-            {
-                orderVM.Orders.Cost = returnCost(orderVM.Orders.ProductId, orderVM.Orders.Quantity);
-                ViewBag.ShowMsg = 1;
-                if(isStoreAuthenticated(orderVM) && orderVM.Orders.UsDate <= DateTime.Now)
-                {
-                    _unitOfWork.Order.Add(orderVM.Orders);
-                    updateInventory(orderVM.Orders.ProductId, orderVM.Orders.Quantity);
-                    updateSellerBalance(orderVM.Orders.Cost);
-                    updateWarehouseBalance(orderVM.Orders.Quantity);
-                    _unitOfWork.Save();
-                    ViewBag.failed = false;
-                }
-                else
-                {
-                    ViewBag.failed = true;
-                }
-            }
+            ViewBag.uNameId = uNameId;
+            PaymentBalance paymentBalance = userBalance(uNameId);
             OrderVM orderVM2 = new OrderVM()
             {
                 Orders = new Order(),
@@ -193,6 +185,31 @@ using Newtonsoft.Json.Converters;
                 }),
                 StatesList = SD.States
             };
+            if (ModelState.IsValid)
+            {
+                orderVM.Orders.Cost = returnCost(orderVM.Orders.ProductId, orderVM.Orders.Quantity);
+                ViewBag.ShowMsg = 1;
+                if (!paymentBalance.AllowNegativeBalance && paymentBalance.Balance < orderVM.Orders.Cost)
+                {
+                    ViewBag.InsufficientFunds = true;
+                    ViewBag.failed = false;
+                    return View(orderVM2);
+                }
+                ViewBag.InsufficientFunds = false;
+                if (isStoreAuthenticated(orderVM) && orderVM.Orders.UsDate <= DateTime.Now)
+                {
+                    _unitOfWork.Order.Add(orderVM.Orders);
+                    updateInventory(orderVM.Orders.ProductId, orderVM.Orders.Quantity);
+                    updateSellerBalance(orderVM.Orders.Cost);
+                    updateWarehouseBalance(orderVM.Orders.Quantity);
+                    _unitOfWork.Save();
+                    ViewBag.failed = false;
+                }
+                else
+                {
+                    ViewBag.failed = true;
+                }
+            }
             return View(orderVM2);
         }
         [HttpPost]
@@ -200,6 +217,23 @@ using Newtonsoft.Json.Converters;
         public IActionResult UpdateOrder(OrderVM orderVM)
         {
             string uNameId = (_unitOfWork.ApplicationUser.GetAll().Where(q => q.UserName == User.Identity.Name).Select(q => q.Id)).FirstOrDefault();
+            ViewBag.uNameId = uNameId;
+            OrderVM orderVM2 = new OrderVM()
+            {
+                Orders = new Order(),
+                ProductList = _unitOfWork.Product.GetAll().Select(i => new SelectListItem
+                {
+                    Text = i.ProductName,
+                    Value = i.Id.ToString()
+                }),
+                StoresList = _unitOfWork.UserStoreName.GetAll().Where(q => q.UserNameId == uNameId).Select(i => new SelectListItem
+                {
+                    Text = i.StoreName,
+                    Value = i.Id.ToString()
+                }),
+                StatesList = SD.States,
+                StatusList = SD.StatusAcceptOrCancel
+            };
             if (ModelState.IsValid)
             {
                 orderVM.Orders.Cost = returnCost(orderVM.Orders.ProductId, orderVM.Orders.Quantity);
@@ -214,6 +248,13 @@ using Newtonsoft.Json.Converters;
                        .Select(a => a.Cost).FirstOrDefault();
                     string oldStatus = _unitOfWork.Order.GetAll().Where(a => a.Id == orderVM.Orders.Id)
                                     .Select(a => a.OrderStatus).FirstOrDefault();
+                    PaymentBalance paymentBalance = userBalance(uNameId);
+                    if (!paymentBalance.AllowNegativeBalance && paymentBalance.Balance < (orderVM.Orders.Cost - oldCost))
+                    {
+                        ViewBag.InsufficientFunds = true;
+                        ViewBag.failed = false;
+                        return View(orderVM2);
+                    }
                     bool fail = false;
                     try
                     {
@@ -261,22 +302,7 @@ using Newtonsoft.Json.Converters;
                     ViewBag.failed = true;
                 }
             }
-            OrderVM orderVM2 = new OrderVM()
-            {
-                Orders = new Order(),
-                ProductList = _unitOfWork.Product.GetAll().Select(i => new SelectListItem
-                {
-                    Text = i.ProductName,
-                    Value = i.Id.ToString()
-                }),
-                StoresList = _unitOfWork.UserStoreName.GetAll().Where(q => q.UserNameId == uNameId).Select(i => new SelectListItem
-                {
-                    Text = i.StoreName,
-                    Value = i.Id.ToString()
-                }),
-                StatesList = SD.States,
-                StatusList = SD.StatusAcceptOrCancel
-            };
+            ViewBag.InsufficientFunds = false;
             return View(orderVM2);
         }
 
@@ -299,8 +325,12 @@ using Newtonsoft.Json.Converters;
         [ValidateAntiForgeryToken]
         public IActionResult AddOrdersExtension(OrderVM orderVM)
         {
+            string uNameId = (_unitOfWork.ApplicationUser.GetAll().Where(q => q.UserName == User.Identity.Name).Select(q => q.Id)).FirstOrDefault();
+            ViewBag.uNameId = uNameId;
+            int processedLines = 0;
             if (ModelState.IsValid)
             {
+                ViewBag.ShowMsg = 1;
                 string allOrders = orderVM.AllOrder;
                 for (int i = 0; i < 3; i++)
                 {
@@ -337,6 +367,14 @@ using Newtonsoft.Json.Converters;
                         {
                             orderVM.Orders.CustStreet2 = RemoveDiacritics(orderVM.Orders.CustStreet2).Replace(",", "");
                         }
+                        PaymentBalance paymentBalance = userBalance(uNameId);
+                        if (!paymentBalance.AllowNegativeBalance && paymentBalance.Balance < orderVM.Orders.Cost)
+                        {
+                            ViewBag.InsufficientFunds = true;
+                            ViewBag.failed ="";
+                            ViewBag.ProcessedLines = processedLines;
+                            return View(orderVM);
+                        }
                         if (isStoreAuthenticated(orderVM) && orderVM.Orders.ProductId > 0 &&
                             orderVM.Orders.UsDate <= DateTime.Now && Enumerable.Range(1, 100).Contains(orderVM.Orders.Quantity) &&
                             orderVM.Orders.CustName.Length >0 && orderVM.Orders.CustStreet1.Length > 0 &&
@@ -348,6 +386,7 @@ using Newtonsoft.Json.Converters;
                             updateWarehouseBalance(orderVM.Orders.Quantity);
                             updateSellerBalance(orderVM.Orders.Cost);
                             _unitOfWork.Save();
+                            processedLines++;
                         }
                         else
                         {
@@ -364,7 +403,9 @@ using Newtonsoft.Json.Converters;
                 //{
                 ViewBag.failed = failedLines;
                     ViewBag.ShowMsg = 1;
-                    return View(orderVM);
+                ViewBag.InsufficientFunds = false;
+                ViewBag.ProcessedLines = processedLines;
+                return View(orderVM);
 
                 //}
                 //return RedirectToAction(nameof(Index));

@@ -19,9 +19,6 @@ function loadDataTable() {
                             <a href="/Admin/Category/Upsert/${data}" class="btn btn-success text-white" style="cursor:pointer">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <a  onclick=Delete("/Admin/Category/Delete/${data}") class="btn btn-danger text-white" style="cursor:pointer">
-                                <i class="fas fa-trash-alt"></i>&nbsp;
-                            </a>
                         </div>
                          `;
                 }, "width": "40%"
@@ -29,7 +26,9 @@ function loadDataTable() {
         ]
     });
 }
-
+//<a onclick=Delete("/Admin/Category/Delete/${data}") class="btn btn-danger text-white" style = "cursor:pointer" >
+//    <i class="fas fa-trash-alt"></i> & nbsp;
+//                            </a >
 function Delete(url) {
     swal({
         title: "Are you sure you want to delete?",

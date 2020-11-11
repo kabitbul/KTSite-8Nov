@@ -37,7 +37,7 @@ namespace KTSite.Areas.UserRole.Controllers
             }
             ViewBag.PendingCount = PendingCount;
             ViewBag.PendingAmount = PendingAmount;
-            //_unitOfWork.Order.
+            //Graph Data
             DateTime iterateDate = DateTime.Now.AddDays(-30);
                 List<DataPoint> dataPoints = new List<DataPoint>();
                 var result = _unitOfWork.Order.GetAll().Where(a=>a.UserNameId == returnUserNameId()).GroupBy(a => a.UsDate)

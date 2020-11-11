@@ -17,6 +17,7 @@ namespace KTSite.Models
         public int ProductId { get; set; }
         //[ForeignKey("ProductId")]
         //public Product Product { get; set; }
+        [Required]
         public string UserNameId { get; set; }
       //  [ForeignKey("UserNameId")]
         //public ApplicationUser ApplicationUser { get; set; }

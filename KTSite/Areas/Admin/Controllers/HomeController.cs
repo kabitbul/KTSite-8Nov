@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using KTSite.Models;
 using KTSite.DataAccess.Repository.IRepository;
 using KTSite.Utility;
+using Newtonsoft.Json;
 
 namespace KTSite.Areas.Admin.Controllers
 {
@@ -27,6 +28,31 @@ namespace KTSite.Areas.Admin.Controllers
         {
             if(User.IsInRole(SD.Role_Admin))
             {
+                ViewBag.Name = _unitOfWork.ApplicationUser.GetAll().Where(q => q.UserName == User.Identity.Name).
+                    Select(q => q.Name).FirstOrDefault();
+                ViewBag.OrdersFromChina =_unitOfWork.ChinaOrder.GetAll().
+                    Where(a => a.DateOrdered.Date <= (DateTime.Now.AddDays(-45).Date)
+                  && a.QuantityReceived == 0).Count();
+                ViewBag.WarehouseBalanceLow = _unitOfWork.PaymentBalance.GetAll().Where(a => a.IsWarehouseBalance).
+                    Select(a => a.Balance).FirstOrDefault();
+                ViewBag.CountPendingPayments = _unitOfWork.PaymentHistory.GetAll().
+                    Where(a => a.Status == SD.PaymentStatusPending).Count();
+                var product = _unitOfWork.Product.GetAll().Where(a => (a.InventoryCount + a.OnTheWayInventory) > 0);
+                long totalInventoryValue = 0; 
+                foreach(Product prod in product)
+                {
+                    totalInventoryValue = totalInventoryValue + (Convert.ToInt64(prod.InventoryCount) + Convert.ToInt64(prod.OnTheWayInventory)) * Convert.ToInt64(prod.Cost);
+                }
+                ViewBag.totalInventoryValue = totalInventoryValue;
+                //stack chart
+                List<DataPoint> dataPointsUser = new List<DataPoint>();
+                List<DataPoint> dataPointsAdmin = new List<DataPoint>();
+                getStackGraphData(false, dataPointsUser);
+                getStackGraphData(true, dataPointsAdmin);
+                ViewBag.DataPointsUser = JsonConvert.SerializeObject(dataPointsUser);
+                ViewBag.DataPointsAdmin = JsonConvert.SerializeObject(dataPointsAdmin);
+
+
                 return View();
             }
             else if (User.IsInRole(SD.Role_Users))
@@ -58,6 +84,46 @@ namespace KTSite.Areas.Admin.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+        public void getStackGraphData(bool isAdmin , List<DataPoint> list)
+        {
+            DateTime iterateDate = DateTime.Now.AddDays(-30);
+            if (isAdmin)
+            {
+                var result = _unitOfWork.Order.GetAll().Where(a => a.IsAdmin && a.OrderStatus != SD.OrderStatusCancelled).GroupBy(a => a.UsDate)
+                          .Select(g => new { date = g.Key, total = g.Sum(i => i.Quantity) }).ToList();
+                while (iterateDate <= DateTime.Now)
+                {
+                    if (result.Exists(x => x.date.ToString("dd/MM") == iterateDate.ToString("dd/MM")))
+                    {
+                        list.Add(new DataPoint(iterateDate.Day.ToString() + "/" + iterateDate.Month.ToString(),
+                                              result.Find(x => x.date.ToString("dd/MM") == iterateDate.ToString("dd/MM")).total));
+                    }
+                    else
+                    {
+                        list.Add(new DataPoint(iterateDate.Day.ToString() + "/" + iterateDate.Month.ToString(), 0));
+                    }
+                    iterateDate = iterateDate.AddDays(1);
+                }
+            }
+            else
+            {
+                var result = _unitOfWork.Order.GetAll().Where(a => !a.IsAdmin && a.OrderStatus != SD.OrderStatusCancelled).GroupBy(a => a.UsDate)
+                          .Select(g => new { date = g.Key, total = g.Sum(i => i.Quantity) }).ToList();
+                while (iterateDate <= DateTime.Now)
+                {
+                    if (result.Exists(x => x.date.ToString("dd/MM") == iterateDate.ToString("dd/MM")))
+                    {
+                        list.Add(new DataPoint(iterateDate.Day.ToString() + "/" + iterateDate.Month.ToString(),
+                                              result.Find(x => x.date.ToString("dd/MM") == iterateDate.ToString("dd/MM")).total));
+                    }
+                    else
+                    {
+                        list.Add(new DataPoint(iterateDate.Day.ToString() + "/" + iterateDate.Month.ToString(), 0));
+                    }
+                    iterateDate = iterateDate.AddDays(1);
+                }
+            }
         }
     }
 }

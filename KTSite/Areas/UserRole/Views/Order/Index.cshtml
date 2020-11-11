@@ -122,10 +122,11 @@
             $('#tblData').DataTable({ "order": [[0, "desc"]], "pageLength": 100 });
         });</script>
     <script>
-            $.fn.dataTable.ext.search.push(
-                function (settings, data, dataIndex) {
+        $.fn.dataTable.ext.search.push(
+            function (settings, data, dataIndex) {
+                var status = data[1];
                     if (($('#Accepted').prop("checked") == true && status == '@KTSite.Utility.SD.OrderStatusAccepted.ToString()') ||
-                        ($('#InProgress').prop("checked") == true && status == '@KTSite.Utility.SD.OrderStatusInProgress.ToString()')
+                        ($('#InProgress').prop("checked") == true && status == '@KTSite.Utility.SD.OrderStatusInProgress.ToString()')||
                         ($('#Done').prop("checked") == true && status == '@KTSite.Utility.SD.OrderStatusDone.ToString()') ||
                         ($('#Cancelled').prop("checked") == true && status == '@KTSite.Utility.SD.OrderStatusCancelled.ToString()') ||
                         ($('#Refunded').prop("checked") == true && status == '@KTSite.Utility.SD.OrderStatusRefunded.ToString()'))

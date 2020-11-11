@@ -18,5 +18,10 @@ namespace KTSite.Models
         public double Balance { get; set; }
         [DefaultValue(false)]
         public bool IsWarehouseBalance { get; set; }
+        [DefaultValue(false)]
+        public bool AllowNegativeBalance { get; set; }
+        [NotMapped]
+        [DefaultValue(false)]
+        public bool isChecked { get; set; }
     }
 }
