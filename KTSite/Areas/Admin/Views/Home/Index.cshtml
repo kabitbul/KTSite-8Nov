@@ -15,7 +15,7 @@
 <div class="text-left display-3 p-4 border rounded col-5">
     <h1 style="font-size: 20px">
         <img src="~/Images/BellNotification.jpg" alt="Site Logo" style="height:30px; width: 30px" />
-        There are @ViewBag.OrdersFromChina Products Ordered more then 45 days ago.
+        <a href="Admin/ChinaOrder">There are @ViewBag.OrdersFromChina Products Ordered more then 45 days ago.</a>
     </h1>
 </div>}
     @if (ViewBag.WarehouseBalanceLow <= 1000)
@@ -23,7 +23,7 @@
 <div class="text-left display-3 p-4 border rounded col-5">
     <h1 style="font-size: 20px">
         <img src="~/Images/Coin.jpg" alt="Site Logo" style="height:30px; width: 30px" />
-        Warehouse Balance is Low!(@ViewBag.WarehouseBalanceLow.ToString("0.00")$)
+        <a href="Admin/PaymentHistory/PayWarehouse">Warehouse Balance is Low!(@ViewBag.WarehouseBalanceLow.ToString("0.00")$)</a>
     </h1>
 </div>}
     @if (ViewBag.CountPendingPayments > 0)
@@ -31,7 +31,7 @@
 <div class="text-left display-3 p-4 border rounded col-5">
     <h1 style="font-size: 20px">
         <img src="~/Images/Coin.jpg" alt="Site Logo" style="height:30px; width: 30px" />
-        There are @ViewBag.CountPendingPayments Pending Payments waiting for your approval!
+        <a href="Admin/PaymentHistory">There are @ViewBag.CountPendingPayments Pending Payments waiting for your approval!</a>
     </h1>
 </div>}
     <div>

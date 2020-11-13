@@ -78,17 +78,17 @@
     {
         @if (ViewBag.InsufficientFunds)
          {
-            <script>
-                swal("Insufficient Funds, Only " + @ViewBag.ProcessedLines + " Orders were Processed Successfully!", "Insufficient Funds.", "warning")
-                    .then((value) => { })
-            </script>
+           <script>
+               swal("Insufficient Funds!", "@ViewBag.failed", "warning")
+                                .then((value) => {})
+           </script>
         }
         else if (ViewBag.failed.Length > 0)
         {
-<script>
-                swal("Pay Attention: An error occured Only " + @ViewBag.ProcessedLines + " Orders were Processed Successfully!, "Please Contact Admin. ", "warning")
-                    .then((value) => { })
-</script> 
+            <script>
+                swal("Error Occured!", "@ViewBag.failed", "warning")
+                                .then((value) => {})
+            </script>
          }
          else
          {

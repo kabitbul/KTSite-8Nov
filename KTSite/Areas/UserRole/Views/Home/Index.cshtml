@@ -10,13 +10,15 @@
         <h1 style="font-size: 20px">
             <img src="~/Images/Coin.jpg" alt="Site Logo" style="height:30px; width: 30px" />
         @ViewBag.Name, Your Current Balance is : @ViewBag.Balance.ToString("0.00")$</h1>
-        @if (ViewBag.PendingCount == 0)
+        @if(ViewBag.PendingCount == 0)
         {
             <h1 style="font-size: 20px">No Pending Payments</h1>
         }
         else
         {
-            <h1 style="font-size: 20px"> You Have @ViewBag.PendingAmount$ waiting for Admin Approval</h1>
+            <h1 style="font-size: 20px"> 
+                <a href="PaymentHistory">You Have @ViewBag.PendingAmount$ waiting for Admin Approval</a>
+        </h1>
         }
     </div>
     &nbsp;

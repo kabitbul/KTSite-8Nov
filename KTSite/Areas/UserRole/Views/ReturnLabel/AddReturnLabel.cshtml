@@ -85,6 +85,13 @@
                     .then((value) => { })
             </script>
         }
+        else if (ViewBag.InsufficientFunds)
+         {
+            <script>
+                swal("Insufficient Funds, Request Label Not Created!", "Insufficient Funds.", "error")
+                    .then((value) => { })
+            </script>
+        }
         else
         {
             <script>

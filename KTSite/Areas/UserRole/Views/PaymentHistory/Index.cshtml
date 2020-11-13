@@ -10,7 +10,7 @@
             <h2 class="text-primary">Payment History </h2>
         </div>
         <div class="col-6 text-right">
-            <a class="btn btn-primary" asp-action="UpsertPayment"><i class="fas fa-plus"></i> &nbsp; Add New Payment</a>
+            <a class="btn btn-primary" asp-action="UpsertPayment" style="background-color:forestgreen"><i class="fas fa-plus"></i> &nbsp; Add New Payment</a>
         </div>
     </div>
 
@@ -58,7 +58,7 @@
     @section Scripts{
         <script>
             $(document).ready(function () {
-                $('#tblData').DataTable({ "order": [[0, "desc"]] });
+                $('#tblData').DataTable({ "order": [[3, "desc"]] });
             });</script>
     }
 

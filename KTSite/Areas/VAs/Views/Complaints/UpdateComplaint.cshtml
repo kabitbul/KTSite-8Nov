@@ -2,10 +2,8 @@
 
 @model KTSite.Models.ComplaintsVM
 
-@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    var title = "Update Complaint";
-}
+@{ Layout = "~/Views/Shared/_Layout.cshtml";
+                var title = "Update Ticket"; }
 
 <form method="post" enctype="multipart/form-data">
     <div class="container">
@@ -15,14 +13,32 @@
                 <h2 class="text-primary">@title</h2>
             </div>
             <div class="col-8 pt-4">
-                <div class="form-group row">
+                <div class="form-group row" id="orderDiv">
                     <div class="col-4">
                         <label asp-for="complaints.OrderId">Order</label>
                     </div>
                     <div class="col-8">
                         @Html.DropDownListFor(m => m.complaints.OrderId, Model.OrdersList,
-                       new { @class = "form-control", @disabled = "disabled" })
+                                                new { @class = "form-control", @disabled = "disabled" })
                         <span asp-validation-for="complaints.OrderId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group row" id="storeDiv">
+                    <div class="col-4">
+                        <label asp-for="complaints.StoreId">Store</label>
+                    </div>
+                    <div class="col-8">
+                        @Html.DropDownListFor(m => m.complaints.StoreId, Model.StoresList,
+                                           new { @class = "form-control" , @disabled = "disabled" })
+                        <span asp-validation-for="complaints.StoreId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-4">
+                        <label asp-for="GeneralNotOrderRelated">General Issue(Not Order Related)</label>
+                    </div>
+                    <div class="col-8">
+                        <input type="checkbox" asp-for="GeneralNotOrderRelated" class="form-control" disabled />
                     </div>
                 </div>
                 <div class="form-group row">
@@ -33,14 +49,14 @@
                         <textarea asp-for="complaints.Description" class="form-control"></textarea>
                     </div>
                 </div>
-                    <div class="form-group row">
-                        <div class="col-4">
-                            <label asp-for="complaints.SolutionDesc">Solution</label>
-                        </div>
-                        <div class="col-8">
-                            <textarea asp-for="complaints.SolutionDesc" class="form-control"></textarea>
-                        </div>
+                <div class="form-group row">
+                    <div class="col-4">
+                        <label asp-for="complaints.SolutionDesc">Solution</label>
                     </div>
+                    <div class="col-8">
+                        <textarea asp-for="complaints.SolutionDesc" class="form-control"></textarea>
+                    </div>
+                </div>
                 <div class="form-group row">
                     <div class="col-4">
                         <label asp-for="complaints.Solved"></label>
@@ -62,6 +78,9 @@
                     <input type="hidden" asp-for="complaints.UserNameId" class="form-control" />
                 </div>
                 <div class="col-8">
+                    <input type="hidden" asp-for="GeneralNotOrderRelated" class="form-control" />
+                </div>
+                <div class="col-8">
                     <input type="hidden" asp-for="complaints.Id" class="form-control" />
                 </div>
                 <div class="col-8">
@@ -69,6 +88,9 @@
                 </div>
                 <div class="col-8">
                     <input type="hidden" asp-for="complaints.OrderId" class="form-control" />
+                </div>
+                <div class="col-8">
+                    <input type="hidden" asp-for="complaints.StoreId" class="form-control" />
                 </div>
             </div>
             <div class="col-8 pt-4">
@@ -92,21 +114,31 @@
 @section Scripts{
     <partial name="_ValidationScriptsPartial" />
     <script src="https://cdn.tiny.cloud/1/h0b6kdvecrt66vsb30f5tpqd7ocxoezkzq6fcfbbvp0xrbfw/tinymce/5/tinymce.min.js"></script>
-    @if (ViewBag.ShowMsg == 1)
+    <script>
+        window.onload = function () {
+            if ($("#GeneralNotOrderRelated").is(':checked')) {
+                $("#orderDiv").hide(0);
+                $("#storeDiv").show(0);
+
+            }
+            else {
+                $("#orderDiv").show(0);
+                $("#storeDiv").hide(0);
+            }
+        }
+            </script>
+@if (ViewBag.ShowMsg == 1)
     {
         @if (ViewBag.IsAdmin)
         {
             <script>
                 swal("Success!", "Complaint Added!", "success")
                     .then((value) => { window.location.href = '/VAs/Complaints'; })
-            </script>
-        }
-        else
-        {
-            <script>
-                swal("Success!", "Complaint Added!", "success")
-                    .then((value) => { window.location.href = '/VAs/Complaints/ShowUserComplaint'; })
-            </script>
-        }
-    }
+    </script> }
+                    else
+                    {
+    <script>
+        swal("Success!", "Complaint Added!", "success")
+            .then((value) => { window.location.href = '/VAs/Complaints/ShowUserComplaint'; })
+    </script>}}
 }

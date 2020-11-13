@@ -20,6 +20,7 @@ namespace KTSite.Utility
         public const string PaymentPaypal = "Paypal";
         public const string PaymentStatusPending = "Pending";
         public const string PaymentStatusApproved = "Approved";
+        public const string PaymentStatusRejected = "Rejected";
         public const string ReturningItemAdd = "Add";
         public const string ReturningItemRemove = "Remove";
         public const string ReturningItemDefective = "Defective";

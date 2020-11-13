@@ -83,6 +83,18 @@ namespace KTSite.Areas.Admin.Controllers
             }
             return View();
         }
+        public IActionResult RejectStatus(int[] Ids)
+        {
+            foreach (int Id in Ids)
+            {
+                PaymentHistory paymentHistory = _unitOfWork.PaymentHistory.GetAll().Where(a => a.Id == Id).FirstOrDefault();
+                paymentHistory.Status = SD.PaymentStatusRejected;
+//                PaymentBalance paymentBalance = _unitOfWork.PaymentBalance.GetAll().Where(a => a.UserNameId == paymentHistory.UserNameId).FirstOrDefault();
+//                paymentBalance.Balance = paymentBalance.Balance + paymentHistory.Amount;
+                _unitOfWork.Save();
+            }
+            return View();
+        }
         public void AddBalanceToWarehouse(double Amount)
         {
             PaymentBalance paymentBalance = _unitOfWork.PaymentBalance.GetAll().Where(a => a.IsWarehouseBalance).FirstOrDefault();

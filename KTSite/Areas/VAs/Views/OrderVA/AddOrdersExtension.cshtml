@@ -49,6 +49,9 @@
                     <input type="hidden" asp-for="Orders.IsAdmin" class="form-control" value=true />
                 </div>
                 <div class="col-8">
+                    <input type="hidden" asp-for="Orders.UserNameId" class="form-control" value="@ViewBag.uNameId" />
+                </div>
+                <div class="col-8">
                     <input type="hidden" asp-for="Orders.OrderStatus" class="form-control" value=@KTSite.Utility.SD.OrderStatusAccepted />
                 </div>
             </div>
@@ -77,17 +80,17 @@
     {
         @if (ViewBag.failed.Length == 0)
         {
-            <script>
-                swal("Success!", "Your Orders Got Saved Successfully!", "success")
+<script>
+                swal("Success!", @ViewBag.ProcessedLines + " Orders were Processed Successfully!", "success")
                     .then((value) => { window.location.href = '/VAs/OrderVA'; })
-            </script>
+</script>
         }
         else
         {
-            <script>
-                 swal("Pay Attention: One or more orders did not go through!", "Please Contact Admin. ", "warning")
+<script>
+    swal("@ViewBag.failed", "warning")
                     .then((value) => {})
-            </script>
+</script>
 
         }
 

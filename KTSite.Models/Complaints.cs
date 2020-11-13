@@ -13,7 +13,7 @@ namespace KTSite.Models
         [Key]
         public long Id { get; set; }
         public long? OrderId { get; set; }
-        [AllowNull]
+        [Required]
         public string UserNameId { get; set; }
         [ForeignKey("UserNameId")]
         public ApplicationUser ApplicationUser { get; set; }
@@ -31,7 +31,7 @@ namespace KTSite.Models
         public string NewTrackingNumber { get; set; }
         [DefaultValue(false)]
         public bool IsAdmin { get; set; }
-        [NotMapped]
-        public string Store { get; set; }
+        
+        public int StoreId { get; set; }
     }
 }

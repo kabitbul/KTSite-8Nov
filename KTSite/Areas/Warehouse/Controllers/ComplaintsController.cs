@@ -26,18 +26,16 @@ namespace KTSite.Areas.Warehouse.Controllers
         public IActionResult Index()
         {
             var complaints = _unitOfWork.Complaints.GetAll();
-            ViewBag.getStore =
-               new Func<string, string>(getStore);
+            ViewBag.getStore = new Func<string, string>(getStore);
             return View(complaints);
         }
         public string getUserName(string unameId)
         {
             return _unitOfWork.ApplicationUser.GetAll().Where(a => a.Id == unameId).Select(a => a.Name).FirstOrDefault();
         }
-        public string getStore(string orderId)
+        public string getStore(string storeId)
         {
-             int storeId = _unitOfWork.Order.GetAll().Where(a => a.Id == Convert.ToInt64(orderId)).Select(a => a.StoreNameId).FirstOrDefault();
-             return _unitOfWork.UserStoreName.GetAll().Where(a => a.Id == storeId).Select(a => a.StoreName).FirstOrDefault();
+            return _unitOfWork.UserStoreName.GetAll().Where(a => a.Id == Convert.ToInt32(storeId)).Select(a => a.StoreName).FirstOrDefault();
         }
         public IActionResult UpdateComplaint(long Id)
         {
@@ -52,7 +50,13 @@ namespace KTSite.Areas.Warehouse.Controllers
                      {
                          Text = i.CustName + "- Id: " + i.Id,
                          Value = i.Id.ToString()
-                     })
+                     }),
+                    StoresList = _unitOfWork.UserStoreName.GetAll().Where(a => a.UserNameId == returnUserNameId()).
+                    Select(i => new SelectListItem
+                    {
+                        Text = i.StoreName,
+                        Value = i.Id.ToString()
+                    })
                 };
             ViewBag.IsAdmin = IsAdmin;
             return View(complaintsVM);
@@ -85,9 +89,22 @@ namespace KTSite.Areas.Warehouse.Controllers
                     {
                         Text = i.CustName + "- Id: " + i.Id,
                         Value = i.Id.ToString()
+                    }),
+                    StoresList = _unitOfWork.UserStoreName.GetAll().Where(a => a.UserNameId == returnUserNameId()).
+                    Select(i => new SelectListItem
+                    {
+                        Text = i.StoreName,
+                        Value = i.Id.ToString()
                     })
                 };
-            
+            if (complaintsVM.complaints.OrderId == 0)
+            {
+                complaintsVM.GeneralNotOrderRelated = true;
+            }
+            else
+            {
+                complaintsVM.GeneralNotOrderRelated = false;
+            }
             ViewBag.IsAdmin = complaintsVM2.complaints.IsAdmin;
             return View(complaintsVM2);
         }

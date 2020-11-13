@@ -63,15 +63,20 @@
             {
                 <td>No</td>
             }
-            @if (!ViewBag.Refunded(returnLabel.OrderId.ToString()))
+            @if (!ViewBag.Refunded(returnLabel.OrderId.ToString()) && !ViewBag.HasLabel(returnLabel.Id.ToString()))
             {
-                <td>
-                    <div class="text-center">
-                        <a href="/UserRole/ReturnLabel/UpdateReturnLabel/@returnLabel.Id" class="btn btn-success text-white" style="cursor:pointer">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                    </div>
-                </td>
+        <td>
+            <div class="text-center">
+                <a href="/UserRole/ReturnLabel/UpdateReturnLabel/@returnLabel.Id" class="btn btn-success text-white" style="cursor:pointer">
+                    <i class="fas fa-edit"></i>
+                </a>
+            </div>
+            <div class="text-center">
+                <a onclick=Delete("/UserRole/ReturnLabel/Delete/@returnLabel.Id") class="btn btn-danger text-white" style="cursor:pointer">
+                    <i class="fas fa-trash-alt"></i>&nbsp;
+                </a>
+            </div>
+        </td>
             }
             else
             {
@@ -87,6 +92,33 @@
     $(document).ready(function () {
                 $('#tblData').DataTable({ "order": [[0, "desc"]] });
             });</script>
+        <script>
+            function Delete(url) {
+                swal({
+                    title: "Are you sure you want to delete?",
+                    text: "You will not be able to restore the data!",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true
+                }).then((willDelete) => {
+                    if (willDelete) {
+                        $.ajax({
+                            type: "DELETE",
+                            url: url,
+                            success: function (data) {
+                                if (data.success) {
+                                    toastr.success(data.message);
+                                    location.reload();
+                                }
+                                else {
+                                    toastr.error(data.message);
+                                }
+                            }
+                        })
+                    }
+                })
+            }
+        </script>
     }
 
 

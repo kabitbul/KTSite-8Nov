@@ -328,6 +328,7 @@ using Newtonsoft.Json.Converters;
             string uNameId = (_unitOfWork.ApplicationUser.GetAll().Where(q => q.UserName == User.Identity.Name).Select(q => q.Id)).FirstOrDefault();
             ViewBag.uNameId = uNameId;
             int processedLines = 0;
+            bool InsufficientFunds = false;
             if (ModelState.IsValid)
             {
                 ViewBag.ShowMsg = 1;
@@ -370,10 +371,16 @@ using Newtonsoft.Json.Converters;
                         PaymentBalance paymentBalance = userBalance(uNameId);
                         if (!paymentBalance.AllowNegativeBalance && paymentBalance.Balance < orderVM.Orders.Cost)
                         {
-                            ViewBag.InsufficientFunds = true;
-                            ViewBag.failed ="";
-                            ViewBag.ProcessedLines = processedLines;
-                            return View(orderVM);
+                            InsufficientFunds = true;
+                            if (failedLines.Length == 0)
+                            {
+                                failedLines = orderVM.Orders.CustName;
+                            }
+                            else
+                            {
+                                failedLines = failedLines + "," + orderVM.Orders.CustName;
+                            }
+                            continue;
                         }
                         if (isStoreAuthenticated(orderVM) && orderVM.Orders.ProductId > 0 &&
                             orderVM.Orders.UsDate <= DateTime.Now && Enumerable.Range(1, 100).Contains(orderVM.Orders.Quantity) &&
@@ -390,20 +397,50 @@ using Newtonsoft.Json.Converters;
                         }
                         else
                         {
-                            failedLines = failedLines + "," + lineNum;
+                            if (failedLines.Length == 0)
+                            {
+                                failedLines = orderVM.Orders.CustName;
+                            }
+                            else
+                            {
+                                failedLines = failedLines + "," + orderVM.Orders.CustName;
+                            }
                         }
                     }
                     catch
                     {
-                        failedLines = failedLines + "," + lineNum; 
+                        if (failedLines.Length == 0)
+                        {
+                            failedLines = orderVM.Orders.CustName;
+                        }
+                        else
+                        {
+                            failedLines = failedLines + "," + orderVM.Orders.CustName;
+                        }
                     }
 
                 }
                 // if(failedLines.Length == 0 )
                 //{
-                ViewBag.failed = failedLines;
-                    ViewBag.ShowMsg = 1;
-                ViewBag.InsufficientFunds = false;
+                if (InsufficientFunds)
+                {
+                    ViewBag.InsufficientFunds = InsufficientFunds;
+                    ViewBag.failed = "InsufficientFunds! Only " + processedLines + " Orders were Processed Successfully!" +
+                    "*failed Orders*: " + failedLines;
+                }
+                else if (failedLines.Length > 0)
+                {
+                    ViewBag.InsufficientFunds = false;
+                    ViewBag.failed = "Pay Attention: An error occured Only " + processedLines + " Orders were Processed Successfully!" +
+                    "*failed Orders*: " + failedLines;
+                    
+                }
+                else
+                {
+                    ViewBag.InsufficientFunds = false;
+                    ViewBag.failed = "";
+                }
+                ViewBag.ShowMsg = 1;
                 ViewBag.ProcessedLines = processedLines;
                 return View(orderVM);
 

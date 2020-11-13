@@ -42,6 +42,7 @@ namespace KTSite.Areas.Warehouse.Controllers
                 
             ViewBag.ShowMsg = 0;
             ViewBag.failed = false;
+            ViewBag.ReturnQuantity = returnLabel.ReturnQuantity;
             return View(returnLabel);
         }
         

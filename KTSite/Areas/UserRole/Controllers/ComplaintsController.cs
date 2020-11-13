@@ -27,7 +27,12 @@ namespace KTSite.Areas.UserRole.Controllers
         {
             var complaints = _unitOfWork.Complaints.GetAll().Where(a=>a.UserNameId == returnUserNameId());
             ViewBag.Refunded = new Func<string, bool>(returnIsRefunded);
+            ViewBag.getStore = new Func<string, string>(getStore);
             return View(complaints);
+        }
+        public string getStore(string storeId)
+        {
+            return _unitOfWork.UserStoreName.GetAll().Where(a => a.Id == Convert.ToInt32(storeId)).Select(a => a.StoreName).FirstOrDefault();
         }
         public bool returnIsRefunded(string OrderId)
         {
@@ -54,6 +59,12 @@ namespace KTSite.Areas.UserRole.Controllers
                     {
                         Text = i.CustName + "- Id: " + i.Id,
                         Value = i.Id.ToString()
+                    }),
+                    StoresList = _unitOfWork.UserStoreName.GetAll().Where(a => a.UserNameId == returnUserNameId()).
+                    Select(i => new SelectListItem
+                    {
+                        Text = i.StoreName,
+                        Value = i.Id.ToString()
                     })
                 };
             }
@@ -65,6 +76,12 @@ namespace KTSite.Areas.UserRole.Controllers
                     OrdersList = _unitOfWork.Order.GetAll().Where(a=> a.Id == Id).Select(i => new SelectListItem
                     {
                         Text = i.CustName + "- Id: " + i.Id,
+                        Value = i.Id.ToString()
+                    }),
+                    StoresList = _unitOfWork.UserStoreName.GetAll().Where(a => a.UserNameId == returnUserNameId()).
+                    Select(i => new SelectListItem
+                    {
+                        Text = i.StoreName,
                         Value = i.Id.ToString()
                     })
                 };
@@ -92,9 +109,22 @@ namespace KTSite.Areas.UserRole.Controllers
                     {
                         Text = i.CustName + "- Id: " + i.Id,
                         Value = i.Id.ToString()
+                    }),
+                StoresList = _unitOfWork.UserStoreName.GetAll().Where(a => a.UserNameId == returnUserNameId()).
+                    Select(i => new SelectListItem
+                    {
+                        Text = i.StoreName,
+                        Value = i.Id.ToString()
                     })
-                };
-
+            };
+            if (complaintsVM.complaints.OrderId == 0)
+            {
+                complaintsVM.GeneralNotOrderRelated = true;
+            }
+            else
+            {
+                complaintsVM.GeneralNotOrderRelated = false;
+            }
             ViewBag.UNameId = uNameId;
             ViewBag.ShowMsg = 0;
             ViewBag.failed = false;
@@ -115,10 +145,25 @@ namespace KTSite.Areas.UserRole.Controllers
             {
                 if (complaintsVM.complaints.Id == 0)
                 {
+                    if (complaintsVM.GeneralNotOrderRelated)
+                    {
+                        complaintsVM.complaints.OrderId = 0;
+                    }
+                    else//if its not a general ticket, get the storeid based on order
+                    {
+                        complaintsVM.complaints.StoreId =
+                            _unitOfWork.Order.GetAll().Where(a => a.Id == complaintsVM.complaints.OrderId).Select(a => a.StoreNameId).
+                            FirstOrDefault(); ;
+                    }
                     _unitOfWork.Complaints.Add(complaintsVM.complaints);
                 }
                 else
                 {
+                    if (complaintsVM.GeneralNotOrderRelated)
+                    {
+                        complaintsVM.complaints.OrderId = 0;
+                        //complaintsVM.complaints.StoreId = 0;
+                    }
                     _unitOfWork.Complaints.update(complaintsVM.complaints);
                 }
                 _unitOfWork.Save();
@@ -136,7 +181,13 @@ namespace KTSite.Areas.UserRole.Controllers
     {
         Text = i.CustName + "- Id: " + i.Id,
         Value = i.Id.ToString()
-    })
+    }),
+                StoresList = _unitOfWork.UserStoreName.GetAll().Where(a => a.UserNameId == returnUserNameId()).
+                    Select(i => new SelectListItem
+                    {
+                        Text = i.StoreName,
+                        Value = i.Id.ToString()
+                    })
             };
             return View(complaintsVM2);
         }
@@ -148,6 +199,10 @@ namespace KTSite.Areas.UserRole.Controllers
             {
                 if (complaintsVM.complaints.Id != 0)
                 {
+                    if (complaintsVM.GeneralNotOrderRelated)
+                    {
+                        complaintsVM.complaints.OrderId = 0;
+                    }
                     _unitOfWork.Complaints.update(complaintsVM.complaints);
                 }
                 _unitOfWork.Save();
@@ -163,7 +218,13 @@ namespace KTSite.Areas.UserRole.Controllers
                 {
                     Text = i.CustName + "- Id: " + i.Id,
                     Value = i.Id.ToString()
-                })
+                }),
+                StoresList = _unitOfWork.UserStoreName.GetAll().Where(a => a.UserNameId == returnUserNameId()).
+                    Select(i => new SelectListItem
+                    {
+                        Text = i.StoreName,
+                        Value = i.Id.ToString()
+                    })
             };
             return View(complaintsVM2);
         }

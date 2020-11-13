@@ -11,6 +11,10 @@
     <Compile Remove="Migrations\20201003112606_addUserStoreName2.Designer.cs" />
     <Compile Remove="Migrations\20201006160131_alterColumnStoreToStoreId.cs" />
     <Compile Remove="Migrations\20201006160131_alterColumnStoreToStoreId.Designer.cs" />
+    <Compile Remove="Migrations\20201113094528_addStoreIdToComplaint.cs" />
+    <Compile Remove="Migrations\20201113094528_addStoreIdToComplaint.Designer.cs" />
+    <Compile Remove="Migrations\20201113094623_addStoreIdToComplaint.cs" />
+    <Compile Remove="Migrations\20201113094623_addStoreIdToComplaint.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -162,6 +162,7 @@ namespace KTSite.Areas.VAs.Controllers
         public IActionResult AddOrdersManually(OrderVM orderVM)
         {
             string uNameId = (_unitOfWork.ApplicationUser.GetAll().Where(q => q.UserName == User.Identity.Name).Select(q => q.Id)).FirstOrDefault();
+            ViewBag.uNameId = uNameId;
             if (ModelState.IsValid)
             {
                 orderVM.Orders.Cost = returnCost(orderVM.Orders.ProductId, orderVM.Orders.Quantity);
@@ -213,6 +214,7 @@ namespace KTSite.Areas.VAs.Controllers
         public IActionResult UpdateOrder(OrderVM orderVM)
         {
             string uNameId = (_unitOfWork.ApplicationUser.GetAll().Where(q => q.UserName == User.Identity.Name).Select(q => q.Id)).FirstOrDefault();
+            ViewBag.uNameId = uNameId;
             if (ModelState.IsValid)
             {
                 orderVM.Orders.Cost = returnCost(orderVM.Orders.ProductId, orderVM.Orders.Quantity);
@@ -292,6 +294,9 @@ namespace KTSite.Areas.VAs.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult AddOrdersExtension(OrderVM orderVM)
         {
+            string uNameId = (_unitOfWork.ApplicationUser.GetAll().Where(q => q.UserName == User.Identity.Name).Select(q => q.Id)).FirstOrDefault();
+            ViewBag.uNameId = uNameId;
+            int processedLines = 0;
             if (ModelState.IsValid)
             {
                 string allOrders = orderVM.AllOrder;
@@ -330,7 +335,7 @@ namespace KTSite.Areas.VAs.Controllers
                         //remove diacritics and comma
                         orderVM.Orders.CustName = RemoveDiacritics(orderVM.Orders.CustName).Replace(",", "");
                         orderVM.Orders.CustStreet1 = RemoveDiacritics(orderVM.Orders.CustStreet1).Replace(",", "");
-                        if (orderVM.Orders.CustStreet1.Length > 0)
+                        if (orderVM.Orders.CustStreet2.Length > 0)
                         {
                             orderVM.Orders.CustStreet2 = RemoveDiacritics(orderVM.Orders.CustStreet2).Replace(",", "");
                         }
@@ -344,27 +349,52 @@ namespace KTSite.Areas.VAs.Controllers
                             updateInventory(orderVM.Orders.ProductId, orderVM.Orders.Quantity);
                             updateWarehouseBalance(orderVM.Orders.Quantity);
                             _unitOfWork.Save();
+                            processedLines++;
                         }
                         else
                         {
-                            failedLines = failedLines + "," + lineNum;
+                            if (failedLines.Length == 0)
+                            {
+                                failedLines = orderVM.Orders.CustName;
+                            }
+                            else
+                            {
+                                failedLines = failedLines + "," + orderVM.Orders.CustName;
+                            }
                         }
                     }
                     catch
                     {
-                        failedLines = failedLines + "," + lineNum; 
+                        if (failedLines.Length == 0)
+                        {
+                            failedLines = orderVM.Orders.CustName;
+                        }
+                        else
+                        {
+                            failedLines = failedLines + "," + orderVM.Orders.CustName;
+                        }
                     }
 
                 }
                 // if(failedLines.Length == 0 )
                 //{
-                ViewBag.failed = failedLines;
-                    ViewBag.ShowMsg = 1;
-                    return View(orderVM);
+                if (failedLines.Length == 0)
+                {
+                    ViewBag.failed = "";
+                }
+                else
+                {
+                    ViewBag.failed = "Pay Attention: An error occured Only " + processedLines + " Orders were Processed Successfully!" +
+                    "*failed Orders*: " + failedLines;
+                }
+                ViewBag.ShowMsg = 1;
+                ViewBag.processedLines = processedLines;
+                return View(orderVM);
 
                 //}
                 //return RedirectToAction(nameof(Index));
             }
+            ViewBag.processedLines = processedLines;
             return View(orderVM.Orders);
         }
         public bool isStoreAuthenticated(OrderVM orderVM)

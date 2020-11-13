@@ -292,6 +292,10 @@ namespace KTSite.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult AddOrdersExtension(OrderVM orderVM)
         {
+            string failedLines = "";
+            string uNameId = (_unitOfWork.ApplicationUser.GetAll().Where(q => q.UserName == User.Identity.Name).Select(q => q.Id)).FirstOrDefault();
+            ViewBag.uNameId = uNameId;
+            int processedLines = 0;
             if (ModelState.IsValid)
             {
                 string allOrders = orderVM.AllOrder;
@@ -311,7 +315,6 @@ namespace KTSite.Areas.Admin.Controllers
                     
                 }
                 var ordersList = allOrders.Split(new string[] { "\"\r\n" },StringSplitOptions.None);
-                string failedLines = "";
                 int lineNum = 0;
                 foreach(var order in ordersList)
                 {
@@ -330,10 +333,11 @@ namespace KTSite.Areas.Admin.Controllers
                         //remove diacritics and comma
                         orderVM.Orders.CustName = RemoveDiacritics(orderVM.Orders.CustName).Replace(",", "");
                         orderVM.Orders.CustStreet1 = RemoveDiacritics(orderVM.Orders.CustStreet1).Replace(",", "");
-                        if (orderVM.Orders.CustStreet1.Length > 0)
+                        if (orderVM.Orders.CustStreet2.Length > 0)
                         {
                             orderVM.Orders.CustStreet2 = RemoveDiacritics(orderVM.Orders.CustStreet2).Replace(",", "");
                         }
+
                         if (isStoreAuthenticated(orderVM) && orderVM.Orders.ProductId > 0 &&
                             orderVM.Orders.UsDate <= DateTime.Now && Enumerable.Range(1, 100).Contains(orderVM.Orders.Quantity) &&
                             orderVM.Orders.CustName.Length > 0 && orderVM.Orders.CustStreet1.Length > 0 &&
@@ -344,27 +348,54 @@ namespace KTSite.Areas.Admin.Controllers
                             updateInventory(orderVM.Orders.ProductId, orderVM.Orders.Quantity);
                             updateWarehouseBalance(orderVM.Orders.Quantity);
                             _unitOfWork.Save();
+                            processedLines++;
                         }
                         else
                         {
-                            failedLines = failedLines + "," + lineNum;
+                            if (failedLines.Length == 0)
+                            {
+                                failedLines = orderVM.Orders.CustName;
+                            }
+                            else
+                            {
+                                failedLines = failedLines + "," + orderVM.Orders.CustName;
+                            }
+                            
                         }
                     }
                     catch
                     {
-                        failedLines = failedLines + "," + lineNum; 
+                        if (failedLines.Length == 0)
+                        {
+                            failedLines = orderVM.Orders.CustName;
+                        }
+                        else
+                        {
+                            failedLines = failedLines + "," + orderVM.Orders.CustName;
+                        }
                     }
 
                 }
                 // if(failedLines.Length == 0 )
                 //{
-                ViewBag.failed = failedLines;
-                    ViewBag.ShowMsg = 1;
+                if (failedLines.Length == 0)
+                {
+                    ViewBag.failed = "";
+                }
+                else
+                {
+                    ViewBag.failed = "Pay Attention: An error occured Only " + 
+                        processedLines + " Orders were Processed Successfully!" +
+                    "*failed Orders*: " + failedLines;
+                }
+                ViewBag.ShowMsg = 1;
+                ViewBag.processedLines = processedLines;
                     return View(orderVM);
 
                 //}
                 //return RedirectToAction(nameof(Index));
             }
+            ViewBag.processedLines = processedLines;
             return View(orderVM.Orders);
         }
         public bool isStoreAuthenticated(OrderVM orderVM)

@@ -33,6 +33,7 @@ namespace KTSite.Areas.UserRole.Controllers
                new Func<string, string>(returnCustName);
             ViewBag.Refunded = new Func<string, bool>(returnIsRefunded);
             ViewBag.OrderQuantity = new Func<string, int>(returnOrderQuantity);
+            ViewBag.HasLabel = new Func<string, bool>(HasLabel);
             return View(returnLabelList);
         }
         public string returnUserNameId()
@@ -58,6 +59,7 @@ namespace KTSite.Areas.UserRole.Controllers
                 returnLabelVM.returnLabel.OrderId = (long)Id;
             }
             returnLabelVM.returnLabel.UserNameId = returnUserNameId();
+            ViewBag.InsufficientFunds = false;
             return View(returnLabelVM);
         }
         public IActionResult UpdateReturnLabel(int Id)
@@ -74,6 +76,7 @@ namespace KTSite.Areas.UserRole.Controllers
             };
             ViewBag.ShowMsg = false;
             ViewBag.failed = false;
+            ViewBag.InsufficientFunds = false;
             return View(returnLabelVM);
         }
         public string returnCustName(string OrderId)
@@ -85,6 +88,13 @@ namespace KTSite.Areas.UserRole.Controllers
         {
             return _unitOfWork.Refund.GetAll().Any(a => a.OrderId == Convert.ToInt64(OrderId));
         }
+        public bool HasLabel(string ReturnLabelId)
+        {
+            string url = _unitOfWork.ReturnLabel.GetAll().Where(a => a.Id == Convert.ToInt32(ReturnLabelId)).Select(a => a.FileURL).FirstOrDefault();
+            if (url != null)
+                return true;
+            return false;
+        }
         public int returnOrderQuantity(string OrderId)
         {
             return _unitOfWork.Order.GetAll().Where(a => a.Id == Convert.ToInt64(OrderId)).Select(a => a.Quantity).FirstOrDefault();
@@ -95,6 +105,16 @@ namespace KTSite.Areas.UserRole.Controllers
         {
             ViewBag.InvalidQuantity = false;
             ViewBag.ShowMsg = false;
+            ReturnLabelVM returnLabelVM2 = new ReturnLabelVM()
+            {
+                returnLabel = new ReturnLabel(),
+                OrderList = _unitOfWork.Order.GetAll().Where(i => i.UserNameId == returnUserNameId()).Select(i => new SelectListItem
+                {
+                    Text = i.Id + "-" + i.CustName + "-Quantity: " + i.Quantity,
+                    Value = i.Id.ToString()
+                })
+            };
+            returnLabelVM2.returnLabel.UserNameId = returnUserNameId();
             if (ModelState.IsValid)
             {
                 int quantity =_unitOfWork.Order.GetAll().Where(a => a.Id == returnLabelVM.returnLabel.OrderId).Select(a => a.Quantity).FirstOrDefault();
@@ -104,22 +124,24 @@ namespace KTSite.Areas.UserRole.Controllers
                 }
                 else
                 {
+                    PaymentBalance paymentBalance = _unitOfWork.PaymentBalance.GetAll().Where(a => a.UserNameId == returnUserNameId()).
+                        FirstOrDefault();
+                    if(paymentBalance.Balance < SD.shipping_cost)
+                    {
+                        ViewBag.InsufficientFunds = true;
+                        ViewBag.ShowMsg = true;
+                        ViewBag.InvalidQuantity = false;
+                        return View(returnLabelVM2);
+                    }
+                    paymentBalance.Balance = paymentBalance.Balance - SD.shipping_cost;
                     ViewBag.InvalidQuantity = false;
                     _unitOfWork.ReturnLabel.Add(returnLabelVM.returnLabel);
                     _unitOfWork.Save();
+
                 }
                 ViewBag.ShowMsg = true;
             }
-                ReturnLabelVM returnLabelVM2 = new ReturnLabelVM()
-                {
-                    returnLabel = new ReturnLabel(),
-                    OrderList = _unitOfWork.Order.GetAll().Where(i=>i.UserNameId == returnUserNameId()).Select(i => new SelectListItem
-                    {
-                        Text = i.Id+"-"+i.CustName + "-Quantity: "+i.Quantity,
-                        Value = i.Id.ToString()
-                    })
-                };
-            returnLabelVM2.returnLabel.UserNameId = returnUserNameId();
+            ViewBag.InsufficientFunds = false;
             return View(returnLabelVM2);
         }
         [HttpPost]
@@ -167,18 +189,20 @@ namespace KTSite.Areas.UserRole.Controllers
             var allObj = _unitOfWork.Product.GetAll();
             return Json(new { data = allObj });
         }
-        //[HttpDelete]
-        //public IActionResult Delete(int id)
-        //{
-        //    var objFromDb = _unitOfWork.Product.Get(id);
-        //    if(objFromDb == null)
-        //    {
-        //        return Json(new { success = false, message = "Error While Deleting" });
-        //    }
-        //    _unitOfWork.Product.Remove(objFromDb);
-        //    _unitOfWork.Save();
-        //    return Json(new { success = true, message = "Delete Successfull" });
-        //}
+        [HttpDelete]
+        public IActionResult Delete(int id)
+        {
+            var objFromDb = _unitOfWork.ReturnLabel.Get(id);
+            if (objFromDb == null)
+            {
+                return Json(new { success = false, message = "Error While Deleting" });
+            }
+            PaymentBalance payment = _unitOfWork.PaymentBalance.GetAll().Where(a => a.UserNameId == returnUserNameId()).FirstOrDefault();
+            payment.Balance = payment.Balance + SD.shipping_cost;
+            _unitOfWork.ReturnLabel.Remove(objFromDb);
+            _unitOfWork.Save();
+            return Json(new { success = true, message = "Delete Successfull, " + SD.shipping_cost +"$ Added Back To Your Balance!" });
+        }
 
         #endregion
     }
