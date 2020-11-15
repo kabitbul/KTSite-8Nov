@@ -29,7 +29,7 @@ namespace KTSite.Areas.UserRole.Controllers
         {
             string uNameId = "";
             string uName = "";
-            var productsList = _unitOfWork.Product.GetAll().Where(a=>a.AvailableForSellers);
+            var productsList = _unitOfWork.Product.GetAll().Where(a=>a.AvailableForSellers).OrderBy(a=>a.ProductName);
             uNameId = (_unitOfWork.ApplicationUser.GetAll().Where(q => q.UserName == User.Identity.Name).Select(q => q.Id)).FirstOrDefault();
             uName = (_unitOfWork.ApplicationUser.GetAll().Where(q => q.UserName == User.Identity.Name).Select(q => q.UserName)).FirstOrDefault();
 
@@ -51,7 +51,9 @@ namespace KTSite.Areas.UserRole.Controllers
             SellersInventoryVM sellersInventoryVM = new SellersInventoryVM()
             {
                 SellersInventory = new SellersInventory(),
-                ProductList = _unitOfWork.Product.GetAll().Where(a=>a.AvailableForSellers).Select(i => new SelectListItem
+                ProductList = _unitOfWork.Product.GetAll().Where(a=>a.AvailableForSellers).
+                OrderBy(a => a.ProductName).
+                Select(i => new SelectListItem
                 {
                     Text = i.ProductName,
                     Value = i.Id.ToString()
@@ -115,8 +117,15 @@ namespace KTSite.Areas.UserRole.Controllers
                 }
                 else
                 {
-                    _unitOfWork.SellersInventory.Add(sellersInventoryVM.SellersInventory);
-                    _unitOfWork.Save();
+                    bool existStore =
+                        _unitOfWork.SellersInventory.GetAll().Any(a => a.UserNameId == returnUserNameId() &&
+                                               a.StoreNameId == sellersInventoryVM.SellersInventory.StoreNameId &&
+                                               a.ProductId == sellersInventoryVM.SellersInventory.ProductId);
+                    if (!existStore)
+                    {
+                        _unitOfWork.SellersInventory.Add(sellersInventoryVM.SellersInventory);
+                        _unitOfWork.Save();
+                    }
                 }
               
                 

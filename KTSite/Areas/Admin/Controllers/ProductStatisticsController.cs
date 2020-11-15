@@ -28,7 +28,7 @@ namespace KTSite.Areas.Admin.Controllers
         }
         public IActionResult Index()
         {
-            IEnumerable<Product> productList = _unitOfWork.Product.GetAll();
+            IEnumerable<Product> productList = _unitOfWork.Product.GetAll().OrderBy(a => a.ProductName);
             List<ProductStatistics> prodStatList = new List<ProductStatistics>();
             foreach(Product product in productList)
             {

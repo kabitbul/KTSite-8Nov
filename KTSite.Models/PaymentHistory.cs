@@ -11,7 +11,7 @@ namespace KTSite.Models
     {
         [Key]
         public long Id { get; set; }
-        [Required]
+        [Required(ErrorMessage = "The Payment Address is required")]
         public int SentFromAddressId { get; set; }
         [Required]
         public string UserNameId { get; set; }

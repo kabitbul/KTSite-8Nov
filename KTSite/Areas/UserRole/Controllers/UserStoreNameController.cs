@@ -25,8 +25,13 @@ namespace KTSite.Areas.UserRole.Controllers
         }
         public IActionResult Index()
         {
-            var userStoreNameList = _unitOfWork.UserStoreName.GetAll();
+            var userStoreNameList = _unitOfWork.UserStoreName.GetAll().Where(a=>a.UserNameId == returnUserNameId());
+            ViewBag.existOrder = new Func<string, bool>(existOrder);
             return View(userStoreNameList);
+        }
+        public bool existOrder(string StoreId)
+        {
+            return _unitOfWork.Order.GetAll().Any(a => a.StoreNameId == Convert.ToInt32(StoreId));
         }
         public IActionResult AddStore()
         {
@@ -35,6 +40,15 @@ namespace KTSite.Areas.UserRole.Controllers
             ViewBag.storeExist = true;
             ViewBag.ShowMsg = 0;
             return View();
+        }
+        public IActionResult UpdateStore(int Id)
+        {
+            ViewBag.UserNameId = returnUserNameId();
+            UserStoreName userStoreName =
+                  _unitOfWork.UserStoreName.GetAll().Where(a => a.Id == Id).FirstOrDefault();
+
+            ViewBag.ShowMsg = false;            
+            return View(userStoreName);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -61,6 +75,20 @@ namespace KTSite.Areas.UserRole.Controllers
 
 
                 //return RedirectToAction(nameof(Index));
+            }
+            return View(userStoreName);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult UpdateStore(UserStoreName userStoreName)
+        {
+            ViewBag.ShowMsg = true;
+            if (ModelState.IsValid)
+            {   
+                    ViewBag.ShowMsg = true;
+                    _unitOfWork.UserStoreName.update(userStoreName);
+                    _unitOfWork.Save();
+                
             }
             return View(userStoreName);
         }

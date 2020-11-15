@@ -49,7 +49,8 @@ using Newtonsoft.Json.Converters;
             OrderVM orderVM = new OrderVM()
             {
                 Orders = new Order(),
-                ProductList = _unitOfWork.Product.GetAll().Where(a=>a.AvailableForSellers).OrderBy(a=>a.ProductName).Select(i => new SelectListItem
+                ProductList = _unitOfWork.Product.GetAll().Where(a=>a.AvailableForSellers && !a.OOSForSellers).
+                OrderBy(a=>a.ProductName).Select(i => new SelectListItem
                 {
                     Text = i.ProductName,
                     Value = i.Id.ToString()
@@ -79,7 +80,8 @@ using Newtonsoft.Json.Converters;
             OrderVM orderVM = new OrderVM()
             {
                 Orders = _unitOfWork.Order.GetAll().Where(a=> a.Id == id).FirstOrDefault(),
-                ProductList = _unitOfWork.Product.GetAll().Where(a=>a.AvailableForSellers).Select(i => new SelectListItem
+                ProductList = _unitOfWork.Product.GetAll().Where(a=>a.AvailableForSellers && !a.OOSForSellers).
+                OrderBy(a => a.ProductName).Select(i => new SelectListItem
                 {
                     Text = i.ProductName,
                     Value = i.Id.ToString()
@@ -108,7 +110,8 @@ using Newtonsoft.Json.Converters;
             OrderVM orderVM = new OrderVM()
             {
                 Orders = new Order(),
-                ProductList = _unitOfWork.Product.GetAll().Where(a=>a.AvailableForSellers).Select(i => new SelectListItem
+                ProductList = _unitOfWork.Product.GetAll().Where(a=>a.AvailableForSellers && !a.OOSForSellers).
+                OrderBy(a => a.ProductName).Select(i => new SelectListItem
                 {
                     Text = i.ProductName,
                     Value = i.Id.ToString()
@@ -173,7 +176,8 @@ using Newtonsoft.Json.Converters;
             OrderVM orderVM2 = new OrderVM()
             {
                 Orders = new Order(),
-                ProductList = _unitOfWork.Product.GetAll().Select(i => new SelectListItem
+                ProductList = _unitOfWork.Product.GetAll().Where(a=>a.AvailableForSellers && !a.OOSForSellers).
+                OrderBy(a => a.ProductName).Select(i => new SelectListItem
                 {
                     Text = i.ProductName,
                     Value = i.Id.ToString()
@@ -221,7 +225,8 @@ using Newtonsoft.Json.Converters;
             OrderVM orderVM2 = new OrderVM()
             {
                 Orders = new Order(),
-                ProductList = _unitOfWork.Product.GetAll().Select(i => new SelectListItem
+                ProductList = _unitOfWork.Product.GetAll().Where(a=>a.AvailableForSellers && !a.OOSForSellers).
+                OrderBy(a => a.ProductName).Select(i => new SelectListItem
                 {
                     Text = i.ProductName,
                     Value = i.Id.ToString()

@@ -91,7 +91,10 @@ namespace KTSite.Areas.Identity.Pages.Account
             };
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
-
+        public string returnUserNameId()
+        {
+            return (_unitOfWork.ApplicationUser.GetAll().Where(q => q.UserName == User.Identity.Name).Select(q => q.Id)).FirstOrDefault();
+        }
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl = returnUrl ?? Url.Content("~/");
@@ -159,6 +162,39 @@ namespace KTSite.Areas.Identity.Pages.Account
                         }
                         else
                         {
+                            if(Input.Role == SD.Role_Users)
+                            {
+                                System.Threading.Thread.Sleep(1000);
+                                string userNameId =
+                                _unitOfWork.ApplicationUser.GetAll().Where(a => a.Email == Input.Email && a.Name == Input.Name
+                                && a.Role == SD.Role_Users).Select(a=> a.Id).FirstOrDefault();
+                                PaymentBalance paymentBalance = new PaymentBalance();
+                                paymentBalance.UserNameId = userNameId;
+                                paymentBalance.Balance = 0;
+                                paymentBalance.IsWarehouseBalance = false;
+                                paymentBalance.AllowNegativeBalance = false;
+                                _unitOfWork.PaymentBalance.Add(paymentBalance);
+                                _unitOfWork.Save();
+                            }
+                            else if(Input.Role == SD.Role_Warehouse)
+                            {
+                                bool exist = _unitOfWork.PaymentBalance.GetAll().Any(a => a.IsWarehouseBalance);
+                                if(!exist)
+                                {
+                                    System.Threading.Thread.Sleep(1000);
+                                    string userNameId =
+                                _unitOfWork.ApplicationUser.GetAll().Where(a => a.Email == Input.Email && a.Name == Input.Name
+                                && a.Role == SD.Role_Users).Select(a => a.Id).FirstOrDefault();
+                                    PaymentBalance paymentBalance = new PaymentBalance();
+                                    paymentBalance.UserNameId = userNameId;
+                                    paymentBalance.Balance = 0;
+                                    paymentBalance.IsWarehouseBalance = true;
+                                    paymentBalance.AllowNegativeBalance = true;
+                                    _unitOfWork.PaymentBalance.Add(paymentBalance);
+                                    _unitOfWork.Save();
+                                }
+                                
+                            }
                             //admin is registering a new user
                             return RedirectToAction("Index", "User", new { Area = "Admin" });
                         }

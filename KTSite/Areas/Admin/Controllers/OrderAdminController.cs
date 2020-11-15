@@ -70,7 +70,7 @@ namespace KTSite.Areas.Admin.Controllers
             OrderVM orderVM = new OrderVM()
             {
                 Orders = new Order(),
-                ProductList = _unitOfWork.Product.GetAll().Select(i => new SelectListItem
+                ProductList = _unitOfWork.Product.GetAll().OrderBy(a => a.ProductName).Select(i => new SelectListItem
                 {
                     Text = i.ProductName,
                     Value = i.Id.ToString()
@@ -98,7 +98,7 @@ namespace KTSite.Areas.Admin.Controllers
             OrderVM orderVM = new OrderVM()
             {
                 Orders = _unitOfWork.Order.GetAll().Where(a => a.Id == id).FirstOrDefault(),
-                ProductList = _unitOfWork.Product.GetAll().Select(i => new SelectListItem
+                ProductList = _unitOfWork.Product.GetAll().OrderBy(a => a.ProductName).Select(i => new SelectListItem
                 {
                     Text = i.ProductName,
                     Value = i.Id.ToString()
@@ -126,7 +126,7 @@ namespace KTSite.Areas.Admin.Controllers
             OrderVM orderVM = new OrderVM()
             {
                 Orders = new Order(),
-                ProductList = _unitOfWork.Product.GetAll().Select(i => new SelectListItem
+                ProductList = _unitOfWork.Product.GetAll().OrderBy(a => a.ProductName).Select(i => new SelectListItem
                 {
                     Text = i.ProductName,
                     Value = i.Id.ToString()
@@ -194,7 +194,7 @@ namespace KTSite.Areas.Admin.Controllers
             OrderVM orderVM2 = new OrderVM()
             {
                 Orders = new Order(),
-                ProductList = _unitOfWork.Product.GetAll().Select(i => new SelectListItem
+                ProductList = _unitOfWork.Product.GetAll().OrderBy(a => a.ProductName).Select(i => new SelectListItem
                 {
                     Text = i.ProductName,
                     Value = i.Id.ToString()
@@ -273,7 +273,7 @@ namespace KTSite.Areas.Admin.Controllers
             OrderVM orderVM2 = new OrderVM()
             {
                 Orders = new Order(),
-                ProductList = _unitOfWork.Product.GetAll().Select(i => new SelectListItem
+                ProductList = _unitOfWork.Product.GetAll().OrderBy(a => a.ProductName).Select(i => new SelectListItem
                 {
                     Text = i.ProductName,
                     Value = i.Id.ToString()
@@ -512,7 +512,7 @@ namespace KTSite.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            var allObj = _unitOfWork.Product.GetAll();
+            var allObj = _unitOfWork.Product.GetAll().OrderBy(a => a.ProductName);
             return Json(new { data = allObj });
         }
         //[HttpDelete]

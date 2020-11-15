@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using System.IO;
 using Microsoft.AspNetCore.Authorization;
 using KTSite.Utility;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace KTSite.Areas.UserRole.Controllers
 {
@@ -29,7 +30,7 @@ namespace KTSite.Areas.UserRole.Controllers
             var PaymentSentAddress = _unitOfWork.PaymentSentAddress.GetAll().Where(a => a.UserNameId == UNameId);
             return View(PaymentSentAddress);
         }
-        public IActionResult AddPaymentType(int? Id)
+        public IActionResult AddPaymentType()
         {
             ViewBag.uNameId = (_unitOfWork.ApplicationUser.GetAll().Where(q => q.UserName == User.Identity.Name).Select(q => q.Id)).FirstOrDefault();
             PaymentSentAddressVM paymentSentAddressVM = new PaymentSentAddressVM()
@@ -37,10 +38,18 @@ namespace KTSite.Areas.UserRole.Controllers
                 PaymentSentAddress = new PaymentSentAddress(),
                 paymentType = SD.paymentType
             };
-            if (Id != null)
+            ViewBag.ShowMsg = 0;
+            return View(paymentSentAddressVM);
+        }
+        public IActionResult EditPaymentType(int Id)
+        {
+            ViewBag.uNameId = (_unitOfWork.ApplicationUser.GetAll().Where(q => q.UserName == User.Identity.Name).Select(q => q.Id)).FirstOrDefault();
+            PaymentSentAddressVM paymentSentAddressVM = new PaymentSentAddressVM()
             {
-                paymentSentAddressVM.PaymentSentAddress = _unitOfWork.PaymentSentAddress.GetAll().Where(a => a.Id == Id).FirstOrDefault();
-            }
+                PaymentSentAddress =
+                _unitOfWork.PaymentSentAddress.GetAll().Where(a => a.Id == Id).FirstOrDefault(),
+                paymentType = SD.paymentType
+            };
             ViewBag.ShowMsg = 0;
             return View(paymentSentAddressVM);
         }
@@ -51,18 +60,23 @@ namespace KTSite.Areas.UserRole.Controllers
             paymentSentAddressVM.paymentType = SD.paymentType;
             if (ModelState.IsValid)
             {
-                if (paymentSentAddressVM.PaymentSentAddress.Id == 0)
-                {
                     _unitOfWork.PaymentSentAddress.Add(paymentSentAddressVM.PaymentSentAddress);
-                }
-                else
-                {
-                    _unitOfWork.PaymentSentAddress.update(paymentSentAddressVM.PaymentSentAddress);
-                }
-                    _unitOfWork.Save();
+                _unitOfWork.Save();
                 ViewBag.ShowMsg = 1;
                 return View(paymentSentAddressVM);
-                //return RedirectToAction(nameof(Index));
+            }
+            return View(paymentSentAddressVM);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult EditPaymentType(PaymentSentAddressVM paymentSentAddressVM)
+        {
+            paymentSentAddressVM.paymentType = SD.paymentType;
+            if (ModelState.IsValid)
+            {
+                _unitOfWork.PaymentSentAddress.update(paymentSentAddressVM.PaymentSentAddress);
+                _unitOfWork.Save();
+                ViewBag.ShowMsg = 1;
             }
             return View(paymentSentAddressVM);
         }

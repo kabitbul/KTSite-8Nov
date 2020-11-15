@@ -33,7 +33,7 @@ namespace KTSite.Areas.UserRole.Controllers
             var PaymentHistory = _unitOfWork.PaymentHistory.GetAll().Where(a => a.UserNameId == UNameId);
             return View(PaymentHistory);
         }
-        public IActionResult UpsertPayment(int? Id)
+        public IActionResult AddPayment()
         {
             string uNameId = (_unitOfWork.ApplicationUser.GetAll().Where(q => q.UserName == User.Identity.Name).Select(q => q.Id)).FirstOrDefault();
             ViewBag.uNameId = uNameId;
@@ -46,10 +46,24 @@ namespace KTSite.Areas.UserRole.Controllers
                     Value = i.Id.ToString()
                 })
             };
-            if (Id != null)
+            ViewBag.ShowMsg = 0;
+            ViewBag.payoneermsg = false;
+            return View(paymentHistoryVM);
+        }
+        public IActionResult UpdatePayment(int Id)
+        {
+            string uNameId = (_unitOfWork.ApplicationUser.GetAll().Where(q => q.UserName == User.Identity.Name).Select(q => q.Id)).FirstOrDefault();
+            ViewBag.uNameId = uNameId;
+            PaymentHistoryVM paymentHistoryVM = new PaymentHistoryVM()
             {
+                PaymentHistory = new PaymentHistory(),
+                PaymentAddress = _unitOfWork.PaymentSentAddress.GetAll().Where(a => a.UserNameId == uNameId).Select(i => new SelectListItem
+                {
+                    Text = i.PaymentTypeAddress + " - " + i.PaymentType,
+                    Value = i.Id.ToString()
+                })
+            };
                 paymentHistoryVM.PaymentHistory = _unitOfWork.PaymentHistory.GetAll().Where(a => a.Id == Id).FirstOrDefault();
-            }
             ViewBag.ShowMsg = 0;
             ViewBag.payoneermsg = false;
             return View(paymentHistoryVM);
@@ -64,7 +78,7 @@ namespace KTSite.Areas.UserRole.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult UpsertPayment(PaymentHistoryVM paymentHistoryVM)
+        public IActionResult AddPayment(PaymentHistoryVM paymentHistoryVM)
         {
             string uNameId = (_unitOfWork.ApplicationUser.GetAll().Where(q => q.UserName == User.Identity.Name).Select(q => q.Id)).FirstOrDefault();
             paymentHistoryVM.PaymentAddress = _unitOfWork.PaymentSentAddress.GetAll().Where(a => a.UserNameId == uNameId).Select(i => new SelectListItem
@@ -81,18 +95,34 @@ namespace KTSite.Areas.UserRole.Controllers
                     paymentHistoryVM.PaymentHistory.Amount = paymentHistoryVM.PaymentHistory.Amount - SD.paypalOneTimeFee -
                         (paymentHistoryVM.PaymentHistory.Amount * SD.paypalPercentFees / 100);
                 }
-                if (paymentHistoryVM.PaymentHistory.Id == 0)
-                {
-                    _unitOfWork.PaymentHistory.Add(paymentHistoryVM.PaymentHistory);
-                }
-                else
-                {
-                    _unitOfWork.PaymentHistory.update(paymentHistoryVM.PaymentHistory);
-                }
-                    _unitOfWork.Save();
+                 _unitOfWork.PaymentHistory.Add(paymentHistoryVM.PaymentHistory);
+                 _unitOfWork.Save();
                 ViewBag.ShowMsg = 1;
-                return View(paymentHistoryVM);
-                //return RedirectToAction(nameof(Index));
+            }
+            return View(paymentHistoryVM);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult UpdatePayment(PaymentHistoryVM paymentHistoryVM)
+        {
+            string uNameId = (_unitOfWork.ApplicationUser.GetAll().Where(q => q.UserName == User.Identity.Name).Select(q => q.Id)).FirstOrDefault();
+            paymentHistoryVM.PaymentAddress = _unitOfWork.PaymentSentAddress.GetAll().Where(a => a.UserNameId == uNameId).Select(i => new SelectListItem
+            {
+                Text = i.PaymentTypeAddress + " - " + i.PaymentType,
+                Value = i.Id.ToString()
+            });
+            if (ModelState.IsValid)
+            {
+                PaymentSentAddress paymentSentAddress =
+                 _unitOfWork.PaymentSentAddress.GetAll().Where(a => a.Id == paymentHistoryVM.PaymentHistory.SentFromAddressId).FirstOrDefault();
+                if (paymentSentAddress.PaymentType == SD.PaymentPaypal)//then fees will apply
+                {
+                    paymentHistoryVM.PaymentHistory.Amount = paymentHistoryVM.PaymentHistory.Amount - SD.paypalOneTimeFee -
+                        (paymentHistoryVM.PaymentHistory.Amount * SD.paypalPercentFees / 100);
+                }
+                    _unitOfWork.PaymentHistory.update(paymentHistoryVM.PaymentHistory);
+                _unitOfWork.Save();
+                ViewBag.ShowMsg = 1;
             }
             return View(paymentHistoryVM);
         }

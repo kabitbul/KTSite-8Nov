@@ -27,7 +27,7 @@ namespace KTSite.Areas.Admin.Controllers
         }
         public IActionResult Index()
         {
-            IEnumerable<Product> product = _unitOfWork.Product.GetAll();
+            IEnumerable<Product> product = _unitOfWork.Product.GetAll().OrderBy(a => a.ProductName);
             ViewBag.getCategoryName =
               new Func<int, string>(getCategoryName);
             ViewBag.Profit =

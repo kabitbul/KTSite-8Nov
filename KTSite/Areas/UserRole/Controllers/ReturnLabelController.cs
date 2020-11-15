@@ -186,7 +186,7 @@ namespace KTSite.Areas.UserRole.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            var allObj = _unitOfWork.Product.GetAll();
+            var allObj = _unitOfWork.Product.GetAll().OrderBy(a => a.ProductName);
             return Json(new { data = allObj });
         }
         [HttpDelete]

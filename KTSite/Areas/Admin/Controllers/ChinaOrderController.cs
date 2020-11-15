@@ -40,7 +40,7 @@ namespace KTSite.Areas.Admin.Controllers
             chinaOrderVM = new ChinaOrderVM()
                 {
                 chinaOrder = new ChinaOrder(),
-                    ProductList = _unitOfWork.Product.GetAll().
+                    ProductList = _unitOfWork.Product.GetAll().OrderBy(a=>a.ProductName).
                     Select(i => new SelectListItem
                     {
                         Text = i.ProductName,
@@ -58,7 +58,7 @@ namespace KTSite.Areas.Admin.Controllers
             ChinaOrderVM chinaOrderVM = new ChinaOrderVM()
                 {
                     chinaOrder = chinaOrder,
-                    ProductList = _unitOfWork.Product.GetAll().
+                    ProductList = _unitOfWork.Product.GetAll().OrderBy(a => a.ProductName).
                      Select(i => new SelectListItem
                      {
                          Text = i.ProductName,
@@ -93,7 +93,7 @@ namespace KTSite.Areas.Admin.Controllers
             ChinaOrderVM chinaOrderVM2 = new ChinaOrderVM()
             {
                 chinaOrder = new ChinaOrder(),
-                ProductList = _unitOfWork.Product.GetAll().
+                ProductList = _unitOfWork.Product.GetAll().OrderBy(a => a.ProductName).
                 Select(i => new SelectListItem
                 {
                     Text = i.ProductName,
@@ -129,7 +129,7 @@ namespace KTSite.Areas.Admin.Controllers
             ChinaOrderVM chinaOrderVM2 = new ChinaOrderVM()
             {
                 chinaOrder = _unitOfWork.ChinaOrder.GetAll().Where(a => a.Id == chinaOrderVM.chinaOrder.Id).FirstOrDefault(),
-                ProductList = _unitOfWork.Product.GetAll().
+                ProductList = _unitOfWork.Product.GetAll().OrderBy(a => a.ProductName).
                     Select(i => new SelectListItem
                     {
                         Text = i.ProductName,
