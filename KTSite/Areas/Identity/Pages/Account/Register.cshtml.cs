@@ -106,7 +106,8 @@ namespace KTSite.Areas.Identity.Pages.Account
                     UserName = Input.Email,
                     Name = Input.Name,
                     Email = Input.Email,
-                    Role = Input.Role
+                    Role = Input.Role,
+                    EmailConfirmed = true
                 };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
@@ -175,6 +176,8 @@ namespace KTSite.Areas.Identity.Pages.Account
                                 paymentBalance.AllowNegativeBalance = false;
                                 _unitOfWork.PaymentBalance.Add(paymentBalance);
                                 _unitOfWork.Save();
+                    
+                            
                             }
                             else if(Input.Role == SD.Role_Warehouse)
                             {

@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using System.Net.Mail;
+using System.Net;
 
 namespace KTSite.Areas.Identity.Pages.Account
 {
@@ -39,29 +41,47 @@ namespace KTSite.Areas.Identity.Pages.Account
         {
             if (ModelState.IsValid)
             {
+                var senderEmail = new MailAddress("ktatmarketing1@gmail.com", "KT");
+                var receiverEmail = new MailAddress(Input.Email, "Receiver");
+                var password = "clashofclans2017";
+                var sub = "Reset Password";
                 var user = await _userManager.FindByEmailAsync(Input.Email);
                 if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
                 {
                     // Don't reveal that the user does not exist or is not confirmed
                     return RedirectToPage("./ForgotPasswordConfirmation");
                 }
-
-                // For more information on how to enable account confirmation and password reset please 
-                // visit https://go.microsoft.com/fwlink/?LinkID=532713
                 var code = await _userManager.GeneratePasswordResetTokenAsync(user);
                 code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                 var callbackUrl = Url.Page(
-                    "/Account/ResetPassword",
-                    pageHandler: null,
-                    values: new { area = "Identity", code },
-                    protocol: Request.Scheme);
-
-                await _emailSender.SendEmailAsync(
-                    Input.Email,
-                    "Reset Password",
-                    $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-
-                return RedirectToPage("./ForgotPasswordConfirmation");
+                      "/Account/ResetPassword",
+                        pageHandler: null,
+                        values: new { area = "Identity", code },
+                        protocol: Request.Scheme);
+                var body = $"Please reset your password Here {HtmlEncoder.Default.Encode(callbackUrl)}.";
+                var smtp = new SmtpClient
+                {
+                    Host = "smtp.gmail.com",
+                    Port = 587,
+                    EnableSsl = true,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    UseDefaultCredentials = false,
+                    Credentials = new NetworkCredential(senderEmail.Address, password)
+                };
+                
+                smtp.UseDefaultCredentials = false;
+                smtp.Credentials = new NetworkCredential(senderEmail.Address, password);
+                smtp.EnableSsl = true;
+                using (var mess = new MailMessage(senderEmail, receiverEmail)
+                {
+                    Subject = "Reset Password",
+                    Body = body
+                })
+                {
+                    smtp.Send(mess);
+                    return RedirectToPage("./ForgotPasswordConfirmation");
+                    
+                }
             }
 
             return Page();
