@@ -43,7 +43,7 @@ namespace KTSite.Areas.Identity.Pages.Account
             {
                 var senderEmail = new MailAddress("ktatmarketing1@gmail.com", "KT");
                 var receiverEmail = new MailAddress(Input.Email, "Receiver");
-                var password = "clashofclans2017";
+                var password = "sendmailsmail";
                 var sub = "Reset Password";
                 var user = await _userManager.FindByEmailAsync(Input.Email);
                 if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))

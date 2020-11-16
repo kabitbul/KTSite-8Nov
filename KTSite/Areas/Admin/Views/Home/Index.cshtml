@@ -10,8 +10,16 @@
             Total Value Of Inventory: <span style="color:seagreen">@ViewBag.totalInventoryValue$</span>
         </h1>
     </div>
-    @if (ViewBag.OrdersFromChina >= 1)
+    @if (ViewBag.OrdersFromChina == 1)
     {
+<div class="text-left display-3 p-4 border rounded col-5">
+    <h1 style="font-size: 20px">
+        <img src="~/Images/BellNotification.jpg" alt="Site Logo" style="height:30px; width: 30px" />
+        <a href="Admin/ChinaOrder">There Is one Product Ordered more then 45 days ago.</a>
+    </h1>
+</div>}
+else if (ViewBag.OrdersFromChina > 1)
+{
 <div class="text-left display-3 p-4 border rounded col-5">
     <h1 style="font-size: 20px">
         <img src="~/Images/BellNotification.jpg" alt="Site Logo" style="height:30px; width: 30px" />
@@ -26,18 +34,27 @@
         <a href="Admin/PaymentHistory/PayWarehouse">Warehouse Balance is Low!(@ViewBag.WarehouseBalanceLow.ToString("0.00")$)</a>
     </h1>
 </div>}
-    @if (ViewBag.CountPendingPayments > 0)
+    @if (ViewBag.CountPendingPayments == 1)
     {
+<div class="text-left display-3 p-4 border rounded col-5">
+    <h1 style="font-size: 20px">
+        <img src="~/Images/Coin.jpg" alt="Site Logo" style="height:30px; width: 30px" />
+        <a href="Admin/PaymentHistory">There is a Pending Payments waiting for your approval!</a>
+    </h1>
+</div>}
+else
+if (ViewBag.CountPendingPayments > 1)
+{
 <div class="text-left display-3 p-4 border rounded col-5">
     <h1 style="font-size: 20px">
         <img src="~/Images/Coin.jpg" alt="Site Logo" style="height:30px; width: 30px" />
         <a href="Admin/PaymentHistory">There are @ViewBag.CountPendingPayments Pending Payments waiting for your approval!</a>
     </h1>
 </div>}
-    <div>
-        <div id="chartContainer" style="height: 370px; width: 70%;"></div>
-        <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
-    </div>
+<div>
+    <div id="chartContainer" style="height: 370px; width: 70%;"></div>
+    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+</div>
 </div>
 @section Scripts{
     <script type="text/javascript">
