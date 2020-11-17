@@ -136,6 +136,7 @@ namespace KTSite.Areas.UserRole.Controllers
                     paymentBalance.Balance = paymentBalance.Balance - SD.shipping_cost;
                     ViewBag.InvalidQuantity = false;
                     _unitOfWork.ReturnLabel.Add(returnLabelVM.returnLabel);
+                    ViewBag.ReturnCost = SD.shipping_cost;
                     _unitOfWork.Save();
 
                 }

@@ -16,7 +16,7 @@
             <div class="col-8 pt-4">
                 <div class="form-group row">
                     <div class="col-4">
-                        <label asp-for="PaymentHistory.SentFromAddressId">Sent From Address Name</label>
+                        <label asp-for="PaymentHistory.SentFromAddressId">Sent From Address</label>
                     </div>
                     <div class="col-8">
                         @Html.DropDownListFor(m => m.PaymentHistory.SentFromAddressId, Model.PaymentAddress,
@@ -27,7 +27,7 @@
                 &nbsp;
                 <div class="form-group row">
                     <div class="col-4">
-                        <label asp-for="PaymentHistory.Amount">Amount Name</label>
+                        <label asp-for="PaymentHistory.Amount">Amount</label>
                     </div>
                     <div class="col-8">
                         <input asp-for="PaymentHistory.Amount" class="form-control" value=0 />

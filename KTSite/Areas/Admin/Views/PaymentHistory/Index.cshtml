@@ -33,6 +33,7 @@
         <table id="tblData" class="table table-striped table-bordered" style="width:100%">
             <thead class="thead-dark">
                 <tr class="table-info">
+                    <th></th>
                     <th>Address</th>
                     <th>Payment Type</th>
                     <th>Amount</th>
@@ -43,26 +44,36 @@
 
             @foreach (PaymentHistory paymentHistory in Model)
             {
-    <tr>
-        <td>@ViewBag.getPaymentAddress(paymentHistory.SentFromAddressId).ToString()</td>
-        <td>@ViewBag.getPaymentType(paymentHistory.SentFromAddressId).ToString()</td>
-        <td>@paymentHistory.Amount$</td>
-        <td>@paymentHistory.PayDate</td>
-        <td>@paymentHistory.Status</td>
-        @if (paymentHistory.Status == KTSite.Utility.SD.PaymentStatusPending)
-        {
-    <td>
-        <div class="text-center">
-            <input type="hidden" asp-for="@paymentHistory.Id" />
-            <input type="checkbox" asp-for="@paymentHistory.isChecked" />
-        </div>
-    </td>
- }
-else
-{
-    <td></td>
-}
-    </tr>
+        <tr>
+            <td>@paymentHistory.Id</td>
+            <td>@ViewBag.getPaymentAddress(paymentHistory.SentFromAddressId).ToString()</td>
+            <td>@ViewBag.getPaymentType(paymentHistory.SentFromAddressId).ToString()</td>
+            <td>@paymentHistory.Amount$</td>
+            <td>@paymentHistory.PayDate</td>
+            @if (paymentHistory.Status == KTSite.Utility.SD.PaymentStatusApproved)
+            {
+              <td style="font-weight:bold;color:forestgreen">@paymentHistory.Status</td> 
+             }
+             else if (paymentHistory.Status == KTSite.Utility.SD.PaymentStatusRejected)
+            {
+                <td style="font-weight:bold;color:red">@paymentHistory.Status</td>
+            }
+            else
+            {
+                <td>@paymentHistory.Status</td>
+            }
+            @if (paymentHistory.Status == KTSite.Utility.SD.PaymentStatusPending)
+            {
+        <td>
+            <div class="text-center">
+                <input type="hidden" asp-for="@paymentHistory.Id" />
+                <input type="checkbox" asp-for="@paymentHistory.isChecked" />
+            </div>
+        </td> }
+                        else
+                        {
+        <td></td>}
+        </tr>
        }
 
         </table>
@@ -79,10 +90,14 @@ else
 @section Scripts{
     <script>
         $(document).ready(function () {
-            $('#tblData').DataTable({ "order": [[3, "desc"]] });
+            $('#tblData').DataTable({ "order": [[0, "desc"]] });
         });
     </script>
-    <script type="text/javascript">
+<script type="text/javascript">
+    //window.onload = function(){
+    //    var table = $('#tblData').DataTable();
+    //    table.draw();
+    //}
         function ApproveStatus() {
             var pdata = new FormData();
             $("input[name='paymentHistory.isChecked']:checked").each(function (index, el) {
@@ -121,8 +136,6 @@ else
                     }
                 });
         }
-    </script>
-    <script type="text/javascript">
         function RejectStatus() {
             var pdata = new FormData();
             $("input[name='paymentHistory.isChecked']:checked").each(function (index, el) {
@@ -161,11 +174,9 @@ else
                     }
                 });
         }
-    </script>
-    <script>
-            $.fn.dataTable.ext.search.push(
+                    $.fn.dataTable.ext.search.push(
                 function (settings, data, dataIndex) {
-                    var status = data[4];
+                    var status = data[5];
                     if (($('#Approved').prop("checked") == true && status == '@KTSite.Utility.SD.PaymentStatusApproved.ToString()') ||
                         ($('#Pending').prop("checked") == true && status == '@KTSite.Utility.SD.PaymentStatusPending.ToString()')||
                         ($('#Rejected').prop("checked") == true && status == '@KTSite.Utility.SD.PaymentStatusRejected.ToString()'))
@@ -179,7 +190,7 @@ else
                 var table = $('#tblData').DataTable();
                 table.draw();
             });
-    </script>
+</script>
 }
 
 

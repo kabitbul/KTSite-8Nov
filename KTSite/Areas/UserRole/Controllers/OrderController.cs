@@ -430,14 +430,39 @@ using Newtonsoft.Json.Converters;
                 if (InsufficientFunds)
                 {
                     ViewBag.InsufficientFunds = InsufficientFunds;
-                    ViewBag.failed = "InsufficientFunds! Only " + processedLines + " Orders were Processed Successfully!" +
+                    if(processedLines == 0)
+                    {
+                        ViewBag.failed = "Insufficient Funds! No Orders were processed!";
+                    }
+                    else if(processedLines == 1)
+                    {
+                        ViewBag.failed = "Insufficient Funds! Only One Order was Processed Successfully!" +
+                        "*failed Orders*: " + failedLines;
+                    }
+                    else
+                    {
+                        ViewBag.failed = "Insufficient Funds! Only " + processedLines + " Orders were Processed Successfully!" +
                     "*failed Orders*: " + failedLines;
+                    }
+                    
                 }
                 else if (failedLines.Length > 0)
                 {
                     ViewBag.InsufficientFunds = false;
-                    ViewBag.failed = "Pay Attention: An error occured Only " + processedLines + " Orders were Processed Successfully!" +
-                    "*failed Orders*: " + failedLines;
+                    if (processedLines == 0)
+                    {
+                        ViewBag.failed = "Pay Attention: An error occured! No Orders were processed!";
+                    }
+                    else if (processedLines == 1)
+                    {
+                        ViewBag.failed = "Pay Attention: An error occured! Only One Order was Processed Successfully!" +
+                        "*failed Orders*: " + failedLines;
+                    }
+                    else
+                    {
+                        ViewBag.failed = "Pay Attention: An error occured Only " + processedLines + " Orders were Processed Successfully!" +
+                     "*failed Orders*: " + failedLines;
+                    }
                     
                 }
                 else

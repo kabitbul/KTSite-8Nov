@@ -1,4 +1,4 @@
-﻿using System;
+﻿ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -384,8 +384,20 @@ namespace KTSite.Areas.VAs.Controllers
                 }
                 else
                 {
-                    ViewBag.failed = "Pay Attention: An error occured Only " + processedLines + " Orders were Processed Successfully!" +
-                    "*failed Orders*: " + failedLines;
+                    if (processedLines == 0)
+                    {
+                        ViewBag.failed = "Pay Attention: An error occured! No Orders were processed!";
+                    }
+                    else if (processedLines == 1)
+                    {
+                        ViewBag.failed = "Pay Attention: An error occured! Only One Order was Processed Successfully!" +
+                        "*failed Orders*: " + failedLines;
+                    }
+                    else
+                    {
+                        ViewBag.failed = "Pay Attention: An error occured Only " + processedLines + " Orders were Processed Successfully!" +
+                     "*failed Orders*: " + failedLines;
+                    }
                 }
                 ViewBag.ShowMsg = 1;
                 ViewBag.processedLines = processedLines;

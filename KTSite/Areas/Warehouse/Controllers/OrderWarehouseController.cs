@@ -80,6 +80,7 @@ namespace KTSite.Areas.Warehouse.Controllers
             {
                 return NotFound();
             }
+            ViewBag.emptyTracking = false;
             return View(orderVM);
         }
         public string returnProductName(int productId)
@@ -138,7 +139,7 @@ namespace KTSite.Areas.Warehouse.Controllers
                     cw.NextRecord();
                     foreach (Order order in orderList)
                     {
-                        if(lineCounter >= 10)
+                        if(lineCounter >= 300)
                         {
                             break;
                         }
@@ -248,13 +249,18 @@ namespace KTSite.Areas.Warehouse.Controllers
                 ViewBag.ShowMsg = 1;
                 // if(isStoreAuthenticated(orderVM) && orderVM.Orders.UsDate <= DateTime.Now)
                 //            {
-                if (orderVM.Orders.TrackingNumber != null)
-                    {
+                if (orderVM.Orders.TrackingNumber == null)
+                {
+                    ViewBag.emptyTracking = true;
+                }
+                else
+                {
                     orderVM.Orders.OrderStatus = SD.OrderStatusDone;
-                    }
                     _unitOfWork.Order.update(orderVM.Orders);
                     _unitOfWork.Save();
                     ViewBag.failed = false;
+                    ViewBag.emptyTracking = false;
+                }
             }
             return View(orderVM);
         }

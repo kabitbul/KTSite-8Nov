@@ -35,6 +35,7 @@ namespace KTSite.DataAccess.Data
         public DbSet<ReturnLabel> returnLabels { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<UserGuideline> UserGuidelines { get; set; }
+        public DbSet<ArrivingFromChina> arrivingFromChinas { get; set; }
 
     }
 }

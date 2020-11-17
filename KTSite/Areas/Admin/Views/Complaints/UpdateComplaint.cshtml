@@ -3,7 +3,7 @@
 @model KTSite.Models.ComplaintsVM
 
 @{ Layout = "~/Views/Shared/_Layout.cshtml";
-                var title = "Update Ticket"; }
+    var title = "Update Ticket"; }
 
 <form method="post" enctype="multipart/form-data">
     <div class="container">
@@ -19,7 +19,7 @@
                     </div>
                     <div class="col-8">
                         @Html.DropDownListFor(m => m.complaints.OrderId, Model.OrdersList,
-                                                new { @class = "form-control", @disabled = "disabled" })
+                                                     new { @class = "form-control", @disabled = "disabled" })
                         <span asp-validation-for="complaints.OrderId" class="text-danger"></span>
                     </div>
                 </div>
@@ -29,7 +29,7 @@
                     </div>
                     <div class="col-8">
                         @Html.DropDownListFor(m => m.complaints.StoreId, Model.StoresList,
-                                           new { @class = "form-control" , @disabled = "disabled" })
+                                                new { @class = "form-control", @disabled = "disabled" })
                         <span asp-validation-for="complaints.StoreId" class="text-danger"></span>
                     </div>
                 </div>
@@ -126,19 +126,29 @@
                 $("#storeDiv").hide(0);
             }
         }
-            </script>
-@if (ViewBag.ShowMsg == 1)
+    </script>
+    @if (ViewBag.ShowMsg == 1)
     {
-        @if (ViewBag.IsAdmin)
-        {
-            <script>
-                swal("Success!", "Complaint Added!", "success")
-                    .then((value) => { window.location.href = '/Admin/Complaints'; })
-    </script> }
-                    else
-                    {
+@if (ViewBag.ProvideSolution)
+{
     <script>
-        swal("Success!", "Complaint Added!", "success")
-            .then((value) => { window.location.href = '/Admin/Complaints/ShowUserComplaint'; })
-    </script>}}
+        swal("Error!", "Please Provide Solution Since You Marked as Solved And didn't Provide Tracking Number!", "error")
+            .then((value) => { })
+    </script>
+
+}
+ else if (ViewBag.IsAdmin)
+                    {
+<script>
+    swal("Success!", "Complaint Added!", "success")
+        .then((value) => { window.location.href = '/Admin/Complaints'; })
+</script>
+ }
+else
+{
+<script>
+    swal("Success!", "Complaint Added!", "success")
+        .then((value) => { window.location.href = '/Admin/Complaints/ShowUserComplaint'; })
+</script>
+}}
 }

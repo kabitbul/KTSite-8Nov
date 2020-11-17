@@ -75,9 +75,19 @@ namespace KTSite.Areas.Warehouse.Controllers
                 {
                     complaintsVM.complaints.Solved = true;
                 }
-                _unitOfWork.Complaints.update(complaintsVM.complaints);
-                _unitOfWork.Save();
                 ViewBag.ShowMsg = 1;
+                if (complaintsVM.complaints.NewTrackingNumber == null && complaintsVM.complaints.Solved &&
+                    complaintsVM.complaints.SolutionDesc == null)
+                {
+                    ViewBag.ProvideSolution = true;
+                }
+                else
+                {
+                    ViewBag.ProvideSolution = false;
+                    _unitOfWork.Complaints.update(complaintsVM.complaints);
+                    _unitOfWork.Save();
+                }
+                
                 //return RedirectToAction(nameof(Index));
             }
             ComplaintsVM complaintsVM2;

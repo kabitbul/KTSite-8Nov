@@ -1,8 +1,9 @@
-﻿@model KTSite.Models.ReturnLabelVM
+﻿
+@model KTSite.Models.ArrivingFromChinaVM
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    var title = "Request a Label";
+    var title = "Add a New Shipment";
 }
 
 <form method="post" enctype="multipart/form-data">
@@ -15,37 +16,46 @@
             <div class="col-8 pt-4">
                 <div class="form-group row">
                     <div class="col-4">
-                        <label asp-for="returnLabel.OrderId">Order</label>
+                        <label asp-for="arrivingFromChina.ProductId">Product</label>
                     </div>
                     <div class="col-8">
-                        @Html.DropDownListFor(m => m.returnLabel.OrderId, Model.OrderList, 
-                       new { @class = "form-control" })
-                        <span asp-validation-for="returnLabel.OrderId" class="text-danger"></span>
+                        @Html.DropDownListFor(m => m.arrivingFromChina.ProductId, Model.ProductList, "Select Product",
+                                      new { @class = "form-control" })
+                        <span asp-validation-for="arrivingFromChina.ProductId" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="form-group row">
                     <div class="col-4">
-                        <label asp-for="returnLabel.ReturnQuantity">Quantity To Return</label>
+                        <label asp-for="arrivingFromChina.NumOfBoxes">Number Of boxes</label>
                     </div>
                     <div class="col-8">
-                        <input asp-for="returnLabel.ReturnQuantity" class="form-control" />
-                        <span asp-validation-for="returnLabel.ReturnQuantity" class="text-danger"></span>
+                        <input asp-for="arrivingFromChina.NumOfBoxes" class="form-control" />
+                        <span asp-validation-for="arrivingFromChina.NumOfBoxes" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="form-group row">
                     <div class="col-4">
-                        <label asp-for="returnLabel.CommentsToWarehouse">Comments to Warehouse</label>
+                        <label asp-for="arrivingFromChina.Quantity">Quantity</label>
                     </div>
                     <div class="col-8">
-                        <input asp-for="returnLabel.CommentsToWarehouse" class="form-control" />
-                        <span asp-validation-for="returnLabel.CommentsToWarehouse" class="text-danger"></span>
+                        <input asp-for="arrivingFromChina.Quantity" class="form-control" />
+                        <span asp-validation-for="arrivingFromChina.Quantity" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-4">
+                        <label asp-for="arrivingFromChina.Comments">Comments</label>
+                    </div>
+                    <div class="col-8">
+                        <input asp-for="arrivingFromChina.Comments" class="form-control" />
+                        <span asp-validation-for="arrivingFromChina.Comments" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="col-8">
-                    <input type="hidden" asp-for="returnLabel.DateCreated" class="form-control" value=@DateTime.Now />
+                    <input type="hidden" asp-for="arrivingFromChina.DateArriving" class="form-control" value="@DateTime.Now" />
                 </div>
                 <div class="col-8">
-                    <input type="hidden" asp-for="returnLabel.UserNameId" class="form-control" />
+                    <input type="hidden" asp-for="arrivingFromChina.UpdatedByAdmin" class="form-control" value=false />
                 </div>
             </div>
             <div class="col-8 pt-4">
@@ -69,35 +79,22 @@
 @section Scripts{
     <partial name="_ValidationScriptsPartial" />
     <script src="https://cdn.tiny.cloud/1/h0b6kdvecrt66vsb30f5tpqd7ocxoezkzq6fcfbbvp0xrbfw/tinymce/5/tinymce.min.js"></script>
-    <script>
-        tinymce.init({
-            selector: 'textarea',
-            plugins: 'lists',
-            menubar: 'file edit format'
-        });
-    </script>
-    @if (ViewBag.ShowMsg)
+    @if (ViewBag.ShowMsg == 1)
     {
-        @if (ViewBag.InvalidQuantity)
+        @*@if (ViewBag.QuantityZero)
         {
             <script>
-                swal("Error!", "Returned Quantity Is Bigger Then Actual Quantity of the order!", "error")
-                    .then((value) => { })
-            </script>
-        }
-        else if (ViewBag.InsufficientFunds)
-         {
-            <script>
-                swal("Insufficient Funds, Request Label Not Created!", "Insufficient Funds.", "error")
-                    .then((value) => { })
+                swal("Error!", "Quantity Can't Be 0 Or Less!", "error")
+                    .then((value) => {})
             </script>
         }
         else
-        {
+        {*@
             <script>
-                swal("Success!", "Return Request Created, you've been charged "+@ViewBag.ReturnCost +"$.", "success")
-                    .then((value) => { window.location.href = '/UserRole/ReturnLabel'; })
+                swal("Success!", "Added Succesfully!", "success")
+                    .then((value) => { window.location.href = '/Warehouse/ArrivingFromChina'; })
             </script>
-        }
+        //}
+
     }
 }

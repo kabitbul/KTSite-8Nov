@@ -24,8 +24,8 @@ namespace KTSite.Models
         [DefaultValue(false)]
         public string Status { get; set; }// status Pending/Approved
 
-        [DataType(DataType.Date)]
-        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+        //[DataType(DataType.Date)]
+        //[DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         [DefaultValue("Now")]
         public DateTime PayDate { get; set; }
         [NotMapped]

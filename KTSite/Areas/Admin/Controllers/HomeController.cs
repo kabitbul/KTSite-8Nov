@@ -44,13 +44,22 @@ namespace KTSite.Areas.Admin.Controllers
                     totalInventoryValue = totalInventoryValue + (Convert.ToInt64(prod.InventoryCount) + Convert.ToInt64(prod.OnTheWayInventory)) * Convert.ToInt64(prod.Cost);
                 }
                 ViewBag.totalInventoryValue = totalInventoryValue;
-                //stack chart
+                ViewBag.CountArrivingFromChina = _unitOfWork.ArrivingFromChina.GetAll().
+                    Where(a => !a.UpdatedByAdmin).Count();
+                //stack chart user\admin
                 List<DataPoint> dataPointsUser = new List<DataPoint>();
                 List<DataPoint> dataPointsAdmin = new List<DataPoint>();
                 getStackGraphData(false, dataPointsUser);
                 getStackGraphData(true, dataPointsAdmin);
                 ViewBag.DataPointsUser = JsonConvert.SerializeObject(dataPointsUser);
                 ViewBag.DataPointsAdmin = JsonConvert.SerializeObject(dataPointsAdmin);
+                //stack chart salesnum\quantity
+                List<DataPoint> dataPointssalesNum = new List<DataPoint>();
+                List<DataPoint> dataPointsQuantity = new List<DataPoint>();
+                getStackGraphData2(false, dataPointssalesNum);
+                getStackGraphData2(true, dataPointsQuantity);
+                ViewBag.DataPointssalesNum = JsonConvert.SerializeObject(dataPointssalesNum);
+                ViewBag.DataPointsQuantity = JsonConvert.SerializeObject(dataPointsQuantity);
 
 
                 return View();
@@ -110,6 +119,48 @@ namespace KTSite.Areas.Admin.Controllers
             {
                 var result = _unitOfWork.Order.GetAll().Where(a => !a.IsAdmin && a.OrderStatus != SD.OrderStatusCancelled).GroupBy(a => a.UsDate)
                           .Select(g => new { date = g.Key, total = g.Sum(i => i.Quantity) }).ToList();
+                while (iterateDate <= DateTime.Now)
+                {
+                    if (result.Exists(x => x.date.ToString("dd/MM") == iterateDate.ToString("dd/MM")))
+                    {
+                        list.Add(new DataPoint(iterateDate.Day.ToString() + "/" + iterateDate.Month.ToString(),
+                                              result.Find(x => x.date.ToString("dd/MM") == iterateDate.ToString("dd/MM")).total));
+                    }
+                    else
+                    {
+                        list.Add(new DataPoint(iterateDate.Day.ToString() + "/" + iterateDate.Month.ToString(), 0));
+                    }
+                    iterateDate = iterateDate.AddDays(1);
+                }
+            }
+        }
+        //true quantity
+        //false salesnum
+        public void getStackGraphData2(bool isQuantity, List<DataPoint> list)
+        {
+            DateTime iterateDate = DateTime.Now.AddDays(-30);
+            if (isQuantity)
+            {
+                var result = _unitOfWork.Order.GetAll().Where(a => a.OrderStatus != SD.OrderStatusCancelled).GroupBy(a => a.UsDate)
+                          .Select(g => new { date = g.Key, total = g.Sum(i => i.Quantity) }).ToList();
+                while (iterateDate <= DateTime.Now)
+                {
+                    if (result.Exists(x => x.date.ToString("dd/MM") == iterateDate.ToString("dd/MM")))
+                    {
+                        list.Add(new DataPoint(iterateDate.Day.ToString() + "/" + iterateDate.Month.ToString(),
+                                              result.Find(x => x.date.ToString("dd/MM") == iterateDate.ToString("dd/MM")).total));
+                    }
+                    else
+                    {
+                        list.Add(new DataPoint(iterateDate.Day.ToString() + "/" + iterateDate.Month.ToString(), 0));
+                    }
+                    iterateDate = iterateDate.AddDays(1);
+                }
+            }
+            else
+            {
+                var result = _unitOfWork.Order.GetAll().Where(a => a.OrderStatus != SD.OrderStatusCancelled).GroupBy(a => a.UsDate)
+                    .Select(g => new { date = g.Key, total = g.Count() }).ToList();
                 while (iterateDate <= DateTime.Now)
                 {
                     if (result.Exists(x => x.date.ToString("dd/MM") == iterateDate.ToString("dd/MM")))

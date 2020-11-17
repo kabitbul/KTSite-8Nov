@@ -30,7 +30,7 @@ namespace KTSite.Areas.UserRole.Controllers
               ViewBag.getPaymentType =
                 new Func<int, string>(getPaymentType);
             string UNameId = (_unitOfWork.ApplicationUser.GetAll().Where(q => q.UserName == User.Identity.Name).Select(q => q.Id)).FirstOrDefault();
-            var PaymentHistory = _unitOfWork.PaymentHistory.GetAll().Where(a => a.UserNameId == UNameId);
+            var PaymentHistory = _unitOfWork.PaymentHistory.GetAll().Where(a => a.UserNameId == UNameId).OrderByDescending(a=>a.PayDate);
             return View(PaymentHistory);
         }
         public IActionResult AddPayment()

@@ -384,9 +384,20 @@ namespace KTSite.Areas.Admin.Controllers
                 }
                 else
                 {
-                    ViewBag.failed = "Pay Attention: An error occured Only " + 
-                        processedLines + " Orders were Processed Successfully!" +
-                    "*failed Orders*: " + failedLines;
+                    if (processedLines == 0)
+                    {
+                        ViewBag.failed = "Pay Attention: An error occured! No Orders were processed!";
+                    }
+                    else if (processedLines == 1)
+                    {
+                        ViewBag.failed = "Pay Attention: An error occured! Only One Order was Processed Successfully!" +
+                        "*failed Orders*: " + failedLines;
+                    }
+                    else
+                    {
+                        ViewBag.failed = "Pay Attention: An error occured Only " + processedLines + " Orders were Processed Successfully!" +
+                     "*failed Orders*: " + failedLines;
+                    }
                 }
                 ViewBag.ShowMsg = 1;
                 ViewBag.processedLines = processedLines;

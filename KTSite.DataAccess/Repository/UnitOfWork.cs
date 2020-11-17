@@ -29,6 +29,7 @@ namespace KTSite.DataAccess.Repository
             ReturnLabel = new ReturnLabelRepository(_db);
             Notification = new NotificationRepository(_db);
             UserGuideline = new UserGuidelineRepository(_db);
+            ArrivingFromChina = new ArrivingFromChinaRepository(_db);
             SP_Call = new SP_Call(_db);
         }
         public IApplicationUserRepository ApplicationUser { get; private set; }
@@ -47,6 +48,7 @@ namespace KTSite.DataAccess.Repository
         public IReturnLabelRepository ReturnLabel { get; private set; }
         public INotificationRepository Notification { get; private set; }
         public IUserGuidelineRepository UserGuideline { get; private set; }
+        public IArrivingFromChinaRepository ArrivingFromChina { get; private set; }
         public ISP_Call SP_Call { get; private set; }
 
         public void Dispose()

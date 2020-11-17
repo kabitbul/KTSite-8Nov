@@ -63,25 +63,23 @@
             {
                 <td>No</td>
             }
+        <td>
+        @if (!ViewBag.Refunded(returnLabel.OrderId.ToString()))
+            {
+        <div class="text-center">
+            <a href="/UserRole/ReturnLabel/UpdateReturnLabel/@returnLabel.Id" class="btn btn-success text-white" style="cursor:pointer">
+                <i class="fas fa-edit"></i>
+            </a>
+        </div>}
             @if (!ViewBag.Refunded(returnLabel.OrderId.ToString()) && !ViewBag.HasLabel(returnLabel.Id.ToString()))
             {
-        <td>
-            <div class="text-center">
-                <a href="/UserRole/ReturnLabel/UpdateReturnLabel/@returnLabel.Id" class="btn btn-success text-white" style="cursor:pointer">
-                    <i class="fas fa-edit"></i>
-                </a>
-            </div>
-            <div class="text-center">
-                <a onclick=Delete("/UserRole/ReturnLabel/Delete/@returnLabel.Id") class="btn btn-danger text-white" style="cursor:pointer">
-                    <i class="fas fa-trash-alt"></i>&nbsp;
-                </a>
-            </div>
+                <div class="text-center">
+                    <a onclick=Delete("/UserRole/ReturnLabel/Delete/@returnLabel.Id") class="btn btn-danger text-white" style="cursor:pointer">
+                        <i class="fas fa-trash-alt"></i>&nbsp;
+                    </a>
+                </div>
+            }
         </td>
-            }
-            else
-            {
-                <td></td>
-            }
         </tr>
             }
         </table>

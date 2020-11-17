@@ -26,10 +26,19 @@ namespace KTSite.Areas.Warehouse.Controllers
         {
             ViewBag.Name = _unitOfWork.ApplicationUser.GetAll().Where(q => q.UserName == User.Identity.Name).Select(q => q.Name).FirstOrDefault();
             ViewBag.Balance = _unitOfWork.PaymentBalance.GetAll().Where(a => a.IsWarehouseBalance).Select(a=>a.Balance).FirstOrDefault();
-            string WarehouseUserId = _unitOfWork.ApplicationUser.GetAll().Where(a => a.Role == SD.Role_Warehouse).Select(a => a.Id).FirstOrDefault();
+            string WarehouseUserId = _unitOfWork.PaymentBalance.GetAll().Where(a => a.IsWarehouseBalance).
+                Select(a => a.UserNameId).FirstOrDefault();
             var paymentHistory = _unitOfWork.PaymentHistory.GetAll().Where(a => a.UserNameId == WarehouseUserId).OrderByDescending(a => a.Id).FirstOrDefault();
-            ViewBag.PayDate = paymentHistory.PayDate;
-            ViewBag.Amount = paymentHistory.Amount;
+            if (paymentHistory != null)
+            {
+                ViewBag.PayDate = paymentHistory.PayDate;
+                ViewBag.Amount = paymentHistory.Amount;
+            }
+            else
+            {
+                ViewBag.PayDate = null;
+                ViewBag.Amount = 0;
+            }
             ViewBag.ExistProgress = _unitOfWork.Order.GetAll().Any(a => a.OrderStatus == SD.OrderStatusInProgress);
             int WaitingForProcess = _unitOfWork.Order.GetAll().Where(a => a.OrderStatus == SD.OrderStatusAccepted).Count();
             ViewBag.WaitingForProcess = WaitingForProcess;

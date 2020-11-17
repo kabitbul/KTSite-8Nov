@@ -32,8 +32,7 @@ namespace KTSite.Areas.Warehouse.Controllers
         public IActionResult Index()
         {
             var returnLabelList = _unitOfWork.ReturnLabel.GetAll().OrderByDescending(q=>q.Id);
-            ViewBag.getCustName =
-               new Func<string, string>(returnCustName);
+            ViewBag.getCustName = new Func<string, string>(returnCustName);
             return View(returnLabelList);
         }
         public IActionResult UpdateReturnLabel(long Id)

@@ -53,7 +53,6 @@ namespace KTSite.Areas.Admin.Controllers
                 double NumOfAvgSell = 0;
                 int Count = _unitOfWork.Order.GetAll().Where(a => a.ProductId == prod.Id &&
                               a.OrderStatus != SD.OrderStatusCancelled &&
-                              a.OrderStatus != SD.OrderStatusRefunded &&
                               a.UsDate.Date >= DateTime.Now.AddDays((avgDay*(-1))).Date &&
                               a.UsDate.Date <= DateTime.Now.AddDays(-1).Date).Sum(a => a.Quantity);
                 if(Count > 0)

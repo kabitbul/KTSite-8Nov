@@ -200,9 +200,18 @@ namespace KTSite.Areas.Admin.Controllers
                 {
                     complaintsVM.complaints.OrderId = 0;
                 }
-                _unitOfWork.Complaints.update(complaintsVM.complaints);
-                _unitOfWork.Save();
                 ViewBag.ShowMsg = 1;
+                if (!complaintsVM.GeneralNotOrderRelated && complaintsVM.complaints.Solved &&
+                    complaintsVM.complaints.NewTrackingNumber == null && complaintsVM.complaints.SolutionDesc == null)
+                {
+                    ViewBag.ProvideSolution = true;
+                }
+                else
+                {
+                    ViewBag.ProvideSolution = false;
+                    _unitOfWork.Complaints.update(complaintsVM.complaints);
+                    _unitOfWork.Save();
+                }
                 //return RedirectToAction(nameof(Index));
             }
             ComplaintsVM complaintsVM2;

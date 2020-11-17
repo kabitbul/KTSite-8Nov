@@ -15,7 +15,8 @@ namespace KTSite.Utility
         public const string OrderStatusInProgress = "In Progress";
         public const string OrderStatusDone = "Done";
         public const string OrderStatusCancelled = "Cancelled";
-        public const string OrderStatusRefunded = "Refunded";
+        public const string OrderStatusFullRefund = "Full Refund";
+        public const string OrderStatusPartialRefund = "Partial Refund";
         public const string PaymentPayoneer = "Payoneer";
         public const string PaymentPaypal = "Paypal";
         public const string PaymentStatusPending = "Pending";
@@ -155,7 +156,7 @@ namespace KTSite.Utility
 //user
 //user kabitbul
 //mail kabitbul@gmail.com
-//Kk111122!
+//KkkK111122!
 
 //when ModelState.IsValid equal to FALSE
 //var errors = ModelState.Where(x => x.Value.Errors.Count > 0).Select(x => new { x.Key, x.Value.Errors }).ToArray()

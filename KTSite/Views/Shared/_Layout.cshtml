@@ -50,6 +50,7 @@
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                     <a class="dropdown-item" asp-area="Admin" asp-controller="ChinaOrder" asp-action="Index">China Orders</a>
                                     <a class="dropdown-item" asp-area="Admin" asp-controller="OrderAdmin" asp-action="Index">Orders</a>
+                                    <a class="dropdown-item" asp-area="Admin" asp-controller="ArrivingFromChinaAdmin" asp-action="Index">Shipments Arrived Warehouse</a>
                                 </div>
                             </li>
                             <li class="nav-item dropdown">
@@ -111,7 +112,8 @@
                                 </a>
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                     <a class="dropdown-item" asp-area="UserRole" asp-controller="PaymentSentAddress" asp-action="Index">Payment Type</a>
-                                    <a class="dropdown-item" asp-area="UserRole" asp-controller="PaymentHistory" asp-action="Index">Add Payment</a>
+                                    <a class="dropdown-item" asp-area="UserRole" asp-controller="PaymentHistory" asp-action="Index">Payment List</a>
+                                    <a class="dropdown-item" asp-area="UserRole" asp-controller="PaymentHistory" asp-action="AddPayment">Create Payment</a>
                                     @*<div class="dropdown-divider"></div>*@
                                 </div>
                             </li>
@@ -121,7 +123,7 @@
                                 </a>
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                     <a class="dropdown-item" asp-area="UserRole" asp-controller="Complaints" asp-action="Index">Tickets</a>
-                                    <a class="dropdown-item" asp-area="UserRole" asp-controller="ReturnLabel" asp-action="Index">Return An Item</a>
+                                    <a class="dropdown-item" asp-area="UserRole" asp-controller="ReturnLabel" asp-action="Index">Returns</a>
                                     <a class="dropdown-item" asp-area="UserRole" asp-controller="UserGuideline" asp-action="Index">User Guideline</a>
                                     @*<div class="dropdown-divider"></div>*@
                                 </div>
@@ -165,6 +167,9 @@
                             </li>
                                 <li class="nav-item">
                                 <a class="nav-link" asp-area="Warehouse" asp-controller="PaymentHistory" asp-action="Index">Payments</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="Warehouse" asp-controller="ArrivingFromChina" asp-action="Index">Shipment From China</a>
                             </li>
                         }
                     </ul>

@@ -23,6 +23,7 @@ namespace KTSite.DataAccess.Repository.IRepository
         IReturnLabelRepository ReturnLabel { get; }
         INotificationRepository Notification { get; }
         IUserGuidelineRepository UserGuideline { get; }
+        IArrivingFromChinaRepository ArrivingFromChina { get; }
         ISP_Call SP_Call { get; }
 
         void Save();

@@ -2,41 +2,42 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-left">
-    <h1 class="display-4" style="color:navy;font-size:30px;font:30px verdana">Welcome Back, @ViewBag.Name!</h1>
+<div class="row">
+    <h1 class="text-left col-6" style="font-size:30px">Hello @ViewBag.Name!</h1>
+    <h1 class="col-4 text-center" style="font-size:30px;font-weight:bold;color:forestgreen;border-style:inset">
+        <img src="~/Images/Coin.jpg" alt="Site Logo" style="height:30px; width: 30px" />
+    Warehouse Balance :@ViewBag.Balance.ToString("0.00")$</h1>
 </div>
 <div class="col-12" style="font:message-box">
-    <div class="text-left display-3 p-4 border rounded col-5" >
-        <h1 style="font-size: 20px">
-            <img src="~/Images/Coin.jpg" alt="Site Logo" style="height:30px; width: 30px" />
-        @ViewBag.Name, Your Current Balance is : @ViewBag.Balance.ToString("0.00")$</h1>
-        @if(ViewBag.PendingCount == 0)
+    <div class="text-left display-3 p-4 border rounded col-5">
+        @if (ViewBag.PendingCount == 0)
         {
             <h1 style="font-size: 20px">No Pending Payments</h1>
         }
         else
         {
-            <h1 style="font-size: 20px"> 
+            <h1 style="font-size: 20px">
                 <a href="PaymentHistory">You Have @ViewBag.PendingAmount$ waiting for Admin Approval</a>
-        </h1>
+            </h1>
         }
     </div>
     &nbsp;
     <div class="text-left display-4 p-2 border rounded col-4">
         <h1 class="display-4" style="color:red;font-size:25px; font:bold 25px verdana">
             <img src="~/Images/BellNotification.jpg" alt="Site Logo" style="height:23px; width: 30px" />
-        Important Admin Notifications:</h1>
+            Important Admin Notifications:
+        </h1>
         <ul>
             @foreach (Notification notification in @ViewBag.NotificationList)
             {
-            <li class="display-4" style="font-size:20px">@notification.Message</li>
-           }
+                <li class="display-4" style="font-size:20px">@notification.Message</li>
+            }
         </ul>
-        </div>
+    </div>
 </div>
 &nbsp;
 <div>
-	<div id="chartContainer" style="height: 370px; width: 70%;"></div>
+    <div id="chartContainer" style="height: 370px; width: 70%;"></div>
     <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
 </div>
 @section Scripts{

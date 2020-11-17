@@ -128,9 +128,18 @@ namespace KTSite.Areas.VAs.Controllers
                     {
                         warehousePaymentBalance.Balance = warehousePaymentBalance.Balance + refundVM.refund.RefundQuantity * SD.shipping_cost;
                     }
+                    if (refundVM.refund.RefundQuantity == order.Quantity)
+                    {
+                        order.OrderStatus = SD.OrderStatusFullRefund;
+                    }
+                    else
+                    {
+                        order.OrderStatus = SD.OrderStatusPartialRefund;
+                    }
+                    _unitOfWork.Order.update(order);
                     _unitOfWork.Refund.Add(refundVM.refund);
+                    _unitOfWork.Save();
                 }
-                _unitOfWork.Save();
                 ViewBag.ShowMsg = 1;
 
 
