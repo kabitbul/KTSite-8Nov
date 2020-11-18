@@ -40,9 +40,12 @@
                 <td>No</td>
             }
             <td>
+                @if(!paymentBalance.IsWarehouseBalance)
+                {
                 <a onclick=Delete("/Admin/PaymentBalance/Delete/@paymentBalance.Id") class="btn btn-danger text-white" style="cursor:pointer">
                     <i class="fas fa-trash-alt"></i>&nbsp;
                 </a>
+                }
             </td>
             @if (ViewBag.IsUserRole(paymentBalance.Id))
             {

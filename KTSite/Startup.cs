@@ -16,6 +16,7 @@ using KTSite.DataAccess.Repository.IRepository;
 using KTSite.DataAccess.Repository;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using KTSite.Utility;
+using KTSite.DataAccess.Initializer;
 
 namespace KTSite
 {
@@ -38,6 +39,7 @@ namespace KTSite
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddSingleton<IEmailSender, EmailSender>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IDbinitializer, Dbinitializer>();
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
             services.AddRazorPages();
             services.ConfigureApplicationCookie(options =>
@@ -49,7 +51,7 @@ namespace KTSite
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IDbinitializer dbinitializer)
         {
             if (env.IsDevelopment())
             {
@@ -69,7 +71,7 @@ namespace KTSite
 
             app.UseAuthentication();
             app.UseAuthorization();
-            
+            dbinitializer.Initialize();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(

@@ -109,27 +109,11 @@ namespace KTSite.Areas.Identity.Pages.Account
                     Role = Input.Role,
                     EmailConfirmed = true
                 };
-                var result = await _userManager.CreateAsync(user, Input.Password);
+                 var result = _userManager.CreateAsync(user, Input.Password).GetAwaiter().GetResult();
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
 
-                    //if(!await _roleManager.RoleExistsAsync(SD.Role_Admin))
-                    //{
-                    //    await _roleManager.CreateAsync(new IdentityRole(SD.Role_Admin));
-                    //}
-                    //if (!await _roleManager.RoleExistsAsync(SD.Role_Users))
-                    //{
-                    //    await _roleManager.CreateAsync(new IdentityRole(SD.Role_Users));
-                    //}
-                    //if (!await _roleManager.RoleExistsAsync(SD.Role_VAs))
-                    //{
-                    //    await _roleManager.CreateAsync(new IdentityRole(SD.Role_VAs));
-                    //}
-                    //if (!await _roleManager.RoleExistsAsync(SD.Role_Warehouse))
-                    //{
-                    //    await _roleManager.CreateAsync(new IdentityRole(SD.Role_Warehouse));
-                    //}
 
                     if (user.Role == null)
                     {
@@ -139,16 +123,6 @@ namespace KTSite.Areas.Identity.Pages.Account
                     {
                         await _userManager.AddToRoleAsync(user, user.Role);
                     }
-                    //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    //code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                    //var callbackUrl = Url.Page(
-                    //    "/Account/ConfirmEmail",
-                    //    pageHandler: null,
-                    //    values: new { area = "Identity", userId = user.Id, code = code, returnUrl = returnUrl },
-                    //    protocol: Request.Scheme);
-
-                    //await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                    //    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
@@ -165,7 +139,7 @@ namespace KTSite.Areas.Identity.Pages.Account
                         {
                             if(Input.Role == SD.Role_Users)
                             {
-                                System.Threading.Thread.Sleep(1000);
+                                //System.Threading.Thread.Sleep(1000);
                                 string userNameId =
                                 _unitOfWork.ApplicationUser.GetAll().Where(a => a.Email == Input.Email && a.Name == Input.Name
                                 && a.Role == SD.Role_Users).Select(a=> a.Id).FirstOrDefault();
@@ -184,10 +158,10 @@ namespace KTSite.Areas.Identity.Pages.Account
                                 bool exist = _unitOfWork.PaymentBalance.GetAll().Any(a => a.IsWarehouseBalance);
                                 if(!exist)
                                 {
-                                    System.Threading.Thread.Sleep(1000);
+                                    //System.Threading.Thread.Sleep(1000);
                                     string userNameId =
                                 _unitOfWork.ApplicationUser.GetAll().Where(a => a.Email == Input.Email && a.Name == Input.Name
-                                && a.Role == SD.Role_Users).Select(a => a.Id).FirstOrDefault();
+                                && a.Role == SD.Role_Warehouse).Select(a => a.Id).FirstOrDefault();
                                     PaymentBalance paymentBalance = new PaymentBalance();
                                     paymentBalance.UserNameId = userNameId;
                                     paymentBalance.Balance = 0;
